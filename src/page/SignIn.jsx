@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
+// import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function SignIn() {
@@ -12,22 +12,23 @@ export default function SignIn() {
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Supaya tidak reload halaman
-    try {
-      const response = await axios.post("http://localhost:5000/api/auth/signin", {
-        email,
-        password,
-      });
+    // try {
+    //   const response = await axios.post("http://localhost:5000/api/auth/signin", {
+    //     email,
+    //     password,
+    //   });
 
-      const { token, user } = response.data;
+    //   const { token, user } = response.data;
 
-      localStorage.setItem("token", token);
+    //   localStorage.setItem("token", token);
 
-      localStorage.setItem("user", JSON.stringify(user));
+    //   localStorage.setItem("user", JSON.stringify(user));
 
-    } catch (err) {
-      console.error(err.response?.data?.error || err.message);
-      setError(err.response?.data?.error || "Something went wrong");
-    }
+    // } catch (err) {
+    //   console.error(err.response?.data?.error || err.message);
+    //   setError(err.response?.data?.error || "Something went wrong");
+    // }
+    navigate("/home");
   };
 
   return (
