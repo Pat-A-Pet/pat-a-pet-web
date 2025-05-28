@@ -1,14 +1,34 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Navbar from "../../component/Navbar";
 import Card from "../../component/card";
 import { FiChevronRight } from "react-icons/fi";
 import PostCard from "../../component/post";
+import { useNavigate } from "react-router-dom";
+import HamsterLoader from "../../component/Loader";
+
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading data
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div>
+        <HamsterLoader size={14} />
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
-
       {/* Hero Section with Text Overlay */}
       <section className="relative w-full h-full">
         <img
@@ -43,7 +63,9 @@ export default function Home() {
                 Take A Look At Some Of Our Pets
             </h2>
             </div>
-            <button className="flex items-center gap-1 px-4 py-2 border border-[#A0C878] text-[#A0C878] rounded-full text-sm hover:bg-[#A0C878] hover:text-white transition">
+            <button 
+            onClick={() => navigate("/listing")}
+            className="flex items-center gap-1 px-4 py-2 border border-[#A0C878] text-[#A0C878] rounded-full text-sm hover:bg-[#A0C878] hover:text-white transition">
                 View More
                 <FiChevronRight className="w-4 h-4" />
             </button>
@@ -97,7 +119,7 @@ export default function Home() {
             </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-100 justify-center mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-100 justify-center mt-8 items-start">
             <PostCard/>
             <PostCard/>
             <PostCard/>

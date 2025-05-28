@@ -32,8 +32,8 @@ const Navbar = () => {
         {/* Center: Desktop Nav */}
         <div className="hidden md:flex flex-1 justify-center gap-8 items-center">
           <Link to="/home" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">Listing</Link>
-          <Link to="/about" className="nav-link">Community</Link>
+          <Link to="/listing" className="nav-link">Listing</Link>
+          <Link to="/community" className="nav-link">Community</Link>
           <Link to="/contact" className="nav-link">Your Pet Hub</Link>
         </div>
 
