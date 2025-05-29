@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import Navbar from "../../component/Navbar";
 import PostCard from "../../component/post";
 import Footer from "../../component/Footer";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Community() {
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 6;
   const totalPosts = 18; // Total number of posts to display
   const totalPages = Math.ceil(totalPosts / cardsPerPage);
+  const navigate = useNavigate();  
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -66,7 +69,9 @@ export default function Community() {
                 </svg>
               </div>
             </div>
-            <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center">
+            <button 
+            onClick={() => navigate("/createpost")}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
               </svg>

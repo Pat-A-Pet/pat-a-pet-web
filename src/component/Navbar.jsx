@@ -34,7 +34,7 @@ const Navbar = () => {
           <Link to="/home" className="nav-link">Home</Link>
           <Link to="/listing" className="nav-link">Listing</Link>
           <Link to="/community" className="nav-link">Community</Link>
-          <Link to="/contact" className="nav-link">Your Pet Hub</Link>
+          <Link to="/myhub" className="nav-link">Your Pet Hub</Link>
         </div>
 
         {/* Right: Profile */}

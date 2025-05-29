@@ -5,6 +5,7 @@ import { FiChevronRight } from "react-icons/fi";
 import PostCard from "../../component/post";
 import { useNavigate } from "react-router-dom";
 import HamsterLoader from "../../component/Loader";
+import Footer from "../../component/Footer";
 
 
 export default function Home() {
@@ -72,10 +73,10 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center mt-8">
-            <Card />
-            <Card />
-            <Card />
-            <Card />
+            <Card showHeart={true}/>
+            <Card showHeart={true} />
+            <Card showHeart={true} />
+            <Card showHeart={false} />
         </div>
         </main>
 
@@ -119,13 +120,13 @@ export default function Home() {
             </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-100 justify-center mt-8 items-start">
-            <PostCard/>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-center mt-8 items-start mb-16">
             <PostCard/>
             <PostCard/>
             <PostCard/>
         </div>
         </main>
+        <Footer/>
     </>
   );
 }

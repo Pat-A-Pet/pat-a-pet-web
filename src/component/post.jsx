@@ -38,7 +38,7 @@ export default function PostCard() {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 text-sm">Sarah Johnson</h3>
-              <p className="text-gray-500 text-xs">2 hours ago • San Francisco</p>
+              <p className="text-gray-500 text-xs">2 hours ago •</p>
             </div>
           </div>
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -55,8 +55,9 @@ export default function PostCard() {
           {/* Post Image */}
           <div className="relative rounded-xl overflow-hidden mb-3 group cursor-pointer">
             <img
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
-              alt="Yosemite hiking"
+              // src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
+              src="/german.webp"
+              alt="Dog"
               className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -64,9 +65,10 @@ export default function PostCard() {
 
           {/* Tags */}
           <div className="flex gap-2 mb-4">
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">#hiking</span>
-            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">#yosemite</span>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">#adventure</span>
+            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">#Training Tips</span>
+            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">#Pet Care</span>
+            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">#Adoption Stories</span>
+            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">#Health & Nutrition</span>
           </div>
         </div>
 

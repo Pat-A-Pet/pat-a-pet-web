@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Heart, MapPin } from "lucide-react";
+import { Heart, MapPin, MoreVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FiEdit, FiTrash } from "react-icons/fi"; 
 
 
-export default function Card() {
+export default function Card({showHeart = false}) {
   const [hover, setHover] = useState(false);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
 
   return (
@@ -16,10 +18,47 @@ export default function Card() {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Love Icon */}
-      <button className="absolute top-[1.4rem] right-8 bg-transparent border-none z-10">
-        <Heart className="w-6 h-6 text-[#fbb9b6]" />
+      {/* Fav Icon or Dots */}
+      <div className="absolute top-[1.4rem] right-8 z-10">
+  {showHeart ? (
+    <button 
+      className="bg-transparent border-none transform transition-transform hover:scale-110 focus:outline-none"
+      aria-label="Favorite"
+    >
+      <Heart className="w-6 h-6 text-rose-500 drop-shadow-sm" />
+    </button>
+  ) : (
+    <div className="relative">
+      <button
+        className="bg-transparent border-none p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        onClick={() => setOpen(!open)}
+        aria-label="More options"
+      >
+        <MoreVertical className="w-6 h-6 text-gray-500" />
       </button>
+
+      {open && (
+        <div className="animate-fade-in absolute right-0 mt-1 w-40 bg-white border border-gray-100 shadow-xl rounded-lg z-20 overflow-hidden transition-all duration-200 origin-top-right">
+          <button 
+            className="flex items-center w-full px-4 py-3 hover:bg-blue-50 text-gray-700 text-sm transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            <FiEdit className="w-4 h-4 mr-3 text-blue-500" />
+            <span>Edit</span>
+          </button>
+          <div className="border-t border-gray-100"></div>
+          <button 
+            className="flex items-center w-full px-4 py-3 hover:bg-red-50 text-red-600 text-sm transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            <FiTrash className="w-4 h-4 mr-3 text-red-500" />
+            <span>Delete</span>
+          </button>
+        </div>
+      )}
+    </div>
+  )}
+</div>
 
       {/* Profile Picture */}
       <div
