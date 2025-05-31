@@ -125,7 +125,7 @@ export default function SignUp() {
         <p className="mt-6 text-gray-600 text-sm">
           Already have an account?{" "}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/signin")}
             className="font-bold hover:underline"
             style={{ color: "#A0C878" }}
           >

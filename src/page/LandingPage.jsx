@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react";
-import Navbar from "../../component/Navbar";
-import Card from "../../component/card";
+import Card from "../component/card";
 import { FiChevronRight } from "react-icons/fi";
-import PostCard from "../../component/post";
+import PostCard from "../component/post";
 import { useNavigate } from "react-router-dom";
-import HamsterLoader from "../../component/Loader";
-import Footer from "../../component/Footer";
+import HamsterLoader from "../component/Loader";
+import Footer from "../component/Footer";
 
 
-export default function Home() {
+export default function LandingPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +28,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
       {/* Hero Section with Text Overlay */}
       <section className="relative w-full h-full">
         <img
@@ -37,6 +35,16 @@ export default function Home() {
           alt="Hero"
           className="w-full h-full object-cover"
         />
+
+        <div className="absolute top-6 right-10 z-10">
+            <button
+            onClick={() => navigate("/signin")}
+            className="bg-white text-[#A0C878] border border-[#A0C878] hover:bg-[#A0C878] hover:text-white px-5 py-2 rounded-full text-sm font-semibold transition"
+            >
+            Sign In
+            </button>
+        </div>
+
         <div className="absolute inset-0 flex items-start pt-42 pl-12">
             <div className="px-8 md:px-20 max-w-xl text-black">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">

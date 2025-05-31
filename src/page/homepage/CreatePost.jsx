@@ -1,11 +1,8 @@
 import React, { useState, useRef } from "react";
 import { X, Image, Smile, MapPin, Hash, Send, ChevronDown, ChevronUp, ArrowLeft, Bookmark, Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-
 
 export default function CreatePostPage() {
-  const navigate = useNavigate();
 
   // Post content states
   const [content, setContent] = useState("");
@@ -66,14 +63,14 @@ export default function CreatePostPage() {
           <div className="flex justify-between items-center p-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <button 
-              onClick={() => navigate("/community")}
+              onClick={() => window.history.back()}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <h2 className="text-xl font-bold text-gray-900">Create New Post</h2>
             </div>
             <button 
-            onClick={() => navigate("/community")}
+            onClick={() => window.history.back()}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors">
               <X className="w-5 h-5 text-gray-600" />
             </button>

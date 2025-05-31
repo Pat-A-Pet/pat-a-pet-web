@@ -336,7 +336,8 @@ const MyHub = () => {
               >
                 <div className="flex justify-between items-center">
                   <h2 className="text-2xl font-bold text-gray-800">My Community Posts</h2>
-                  <motion.button 
+                  <motion.button
+                    onClick={() => navigate("/createpost")}
                     className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -464,7 +465,8 @@ const MyHub = () => {
                             </div>
                             
                             <div className="mt-4 flex space-x-3">
-                              <motion.button 
+                              <motion.button
+                                onClick={() => navigate("/editadopt")}
                                 className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-medium transition"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
