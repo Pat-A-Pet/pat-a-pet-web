@@ -5,36 +5,44 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [name, setName] = useState(""); // New
+  const [name, setName] = useState(""); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // New
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(""); 
+
+    if (!name || !email || !password || !confirmPassword) {
+      setError("All fields are required");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
-        name,
-        email,
-        password,
-      });
+    const payload = {
+      fullname : name,
+      email,
+      password,
+    };
 
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/signup", payload);
       const { token, user } = response.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      navigate("/home");
     } catch (err) {
-      setError(err.response?.data?.error || "Signup failed");
+      console.error(err.response?.data?.error || err.message);
+      setError(err.response?.data?.error || "Something went wrong during registration");
     }
   };
 
@@ -52,17 +60,14 @@ export default function SignUp() {
             Welcome to <br /> Pat-A-Pet
           </h1>
           <hr className="border-white w-20 my-4" />
-          <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p>
+          {/* <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p> */}
+          <p className="text-lg">Connecting pets with loving homes, faster and simpler than ever.</p>
         </div>
       </div>
 
       {/* Right Section */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-[#FDF7F4] p-10 rounded-tl-[50px] rounded-bl-[50px] shadow-lg">
-        <img
-          src="logo.png"
-          alt="logo"
-          className="w-40 mb-3"
-        />
+        <img src="logo.png" alt="logo" className="w-40 mb-3" />
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">Create Account</h2>
 
         <form className="w-3/4" onSubmit={handleSignUp}>

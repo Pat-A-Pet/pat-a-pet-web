@@ -1,14 +1,84 @@
 import React, { useState } from "react";
-import { Heart, MapPin, MoreVertical } from "lucide-react";
+import { Heart, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit, FiTrash } from "react-icons/fi"; 
+import { useContext } from "react";
+import axios from "axios";
+import { UserContext } from "../context/UserContext";
 
-
-export default function Card({showHeart = false}) {
+export default function Card({ pet }) {
   const [hover, setHover] = useState(false);
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const { user } = useContext(UserContext);
+  const [liked, setLiked] = useState(() => {
+    try {
+      const userId = user?._id?.toString();
+      return pet?.loves?.some(id => id?.toString() === userId) || false;
+    } catch (error) {
+      console.error("Error checking initial like status:", error);
+      return false;
+    }
+  });
+  const [saving, setSaving] = useState(false);
 
+  // Default data if no pet is provided
+  const defaultPet = {
+    name: "German Shepherd",
+    species: "Dog",
+    breed: "German Shepherd",
+    age: "2 years old",
+    weight: "65 lbs",
+    location: "Indonesia",
+    images: ["german.webp"],
+    _id: "default"
+  };
+
+  const displayPet = pet || defaultPet;
+
+  const handleToggleLove = async (e) => {
+    e.stopPropagation();
+    
+    // Don't proceed if no user or it's the default pet
+    if (!user) {
+      alert("Please log in to use favorites.");
+      return;
+    }
+    
+    if (displayPet._id === "default") {
+      return;
+    }
+
+    const optimisticLiked = !liked;
+    setLiked(optimisticLiked);
+    setSaving(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const { data } = await axios.patch(
+        `http://localhost:5000/api/pets/pet-love/${displayPet._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Safely update based on server response
+      const userId = user._id?.toString();
+      const isLiked = data.loves?.some(id => id?.toString() === userId) || false;
+      setLiked(isLiked);
+    } catch (err) {
+      console.error("Error toggling favorite:", err.response?.data || err.message);
+      setLiked(!optimisticLiked); // Revert on error
+      alert("Failed to update favorite. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -17,48 +87,25 @@ export default function Card({showHeart = false}) {
       }`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={() => navigate(`/petdetail/${displayPet._id}`)}
     >
-      {/* Fav Icon or Dots */}
+      {/* Fav Icon */}
       <div className="absolute top-[1.4rem] right-8 z-10">
-  {showHeart ? (
-    <button 
-      className="bg-transparent border-none transform transition-transform hover:scale-110 focus:outline-none"
-      aria-label="Favorite"
-    >
-      <Heart className="w-6 h-6 text-rose-500 drop-shadow-sm" />
-    </button>
-  ) : (
-    <div className="relative">
-      <button
-        className="bg-transparent border-none p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
-        onClick={() => setOpen(!open)}
-        aria-label="More options"
-      >
-        <MoreVertical className="w-6 h-6 text-gray-500" />
-      </button>
-
-      {open && (
-        <div className="animate-fade-in absolute right-0 mt-1 w-40 bg-white border border-gray-100 shadow-xl rounded-lg z-20 overflow-hidden transition-all duration-200 origin-top-right">
-          <button 
-            className="flex items-center w-full px-4 py-3 hover:bg-blue-50 text-gray-700 text-sm transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <FiEdit className="w-4 h-4 mr-3 text-blue-500" />
-            <span>Edit</span>
-          </button>
-          <div className="border-t border-gray-100"></div>
-          <button 
-            className="flex items-center w-full px-4 py-3 hover:bg-red-50 text-red-600 text-sm transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <FiTrash className="w-4 h-4 mr-3 text-red-500" />
-            <span>Delete</span>
-          </button>
-        </div>
-      )}
-    </div>
-  )}
-</div>
+        <button
+          onClick={handleToggleLove}
+          disabled={saving || displayPet._id === "default" || !user}
+          className={`bg-transparent border-none transform transition-all duration-300 hover:scale-110 focus:outline-none ${
+            displayPet._id === "default" || !user ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          aria-label={liked ? "Remove from favorites" : "Add to favorites"}
+        >
+          {liked ? (
+            <Heart className="w-6 h-6 text-rose-600 fill-rose-600" />
+          ) : (
+            <Heart className="w-6 h-6 text-rose-500 drop-shadow-sm" />
+          )}
+        </button>
+      </div>
 
       {/* Profile Picture */}
       <div
@@ -69,12 +116,14 @@ export default function Card({showHeart = false}) {
         }`}
       >
         <img
-          src="german.webp"
-          alt="profile"
+          src={
+            displayPet.imageUrls && displayPet.imageUrls.length > 0
+              ? displayPet.imageUrls[0]
+              : "german.webp"
+          }
+          alt={displayPet.name || "Pet"}
           className={`w-full h-full object-cover transition-all duration-500 ${
-            hover
-              ? "scale-[1] object-[50%_30%] delay-500"
-              : "object-center"
+            hover ? "scale-[1] object-[50%_30%] delay-500" : "object-center"
           }`}
         />
       </div>
@@ -86,27 +135,28 @@ export default function Card({showHeart = false}) {
         }`}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-        
+
         <div className="absolute bottom-0 left-6 right-6 h-[200px] flex flex-col justify-between py-4">
           <div className="space-y-2">
-            <span className="block text-white font-bold text-xl tracking-wide mt-2">German Shepherd</span>
-            {/* <span className="block text-white/90 text-sm leading-relaxed">
-              Passionate designer crafting peaceful digital spaces.
-            </span> */}
+            <span className="block text-white font-bold text-xl tracking-wide mt-2">
+              {displayPet.name || "Unknown Pet"}
+            </span>
           </div>
 
           {/* Expandable Content */}
-          <div className={`space-y-3 transition-all duration-500 ${
-            hover ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-          }`}>
+          <div
+            className={`space-y-3 transition-all duration-500 ${
+              hover ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            }`}
+          >
             <div className="grid grid-cols-2 gap-3 text-white/80 text-xs">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
                 <span className="block font-medium text-white">Age</span>
-                <span>2 years old</span>
+                <span>{displayPet.age || "Unknown"}</span>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
                 <span className="block font-medium text-white">Weight</span>
-                <span>65 lbs</span>
+                <span>{displayPet.weight || "Unknown"}</span>
               </div>
             </div>
           </div>
@@ -117,22 +167,25 @@ export default function Card({showHeart = false}) {
               <div className="flex items-center gap-2 text-white/90">
                 <MapPin className="w-4 h-4" />
                 <span className="text-sm hover:text-white transition-colors cursor-pointer">
-                  Indonesia
+                  {displayPet.location || "Unknown Location"}
                 </span>
               </div>
               <span className="text-white text-sm font-medium hover:text-green-200 transition-colors cursor-pointer">
-                German Shepherd
+                {displayPet.breed || displayPet.species || "Unknown Breed"}
               </span>
             </div>
 
-            <button 
-            // navigate(`/petdetail/${pet.id}`);
-            onClick={() => navigate("/petdetail")}
-            className={`bg-white text-green-600 px-5 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg text-sm ${
-              hover 
-                ? "bg-yellow-200 text-green-800 transform scale-105 shadow-xl hover:shadow-2xl" 
-                : "hover:bg-green-50 hover:scale-105"
-            }`}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/petdetail/${displayPet._id}`);
+              }}
+              className={`bg-white text-green-600 px-5 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg text-sm ${
+                hover
+                  ? "bg-yellow-200 text-green-800 transform scale-105 shadow-xl hover:shadow-2xl"
+                  : "hover:bg-green-50 hover:scale-105"
+              }`}
+            >
               Adopt
             </button>
           </div>
@@ -140,12 +193,16 @@ export default function Card({showHeart = false}) {
       </div>
 
       {/* Floating Elements */}
-      <div className={`absolute top-4 left-4 w-3 h-3 bg-green-400 rounded-full transition-all duration-500 ${
-        hover ? "opacity-100 scale-100" : "opacity-0 scale-0"
-      }`}></div>
-      <div className={`absolute top-8 left-8 w-2 h-2 bg-emerald-300 rounded-full transition-all duration-700 delay-100 ${
-        hover ? "opacity-100 scale-100" : "opacity-0 scale-0"
-      }`}></div>
+      <div
+        className={`absolute top-4 left-4 w-3 h-3 bg-green-400 rounded-full transition-all duration-500 ${
+          hover ? "opacity-100 scale-100" : "opacity-0 scale-0"
+        }`}
+      ></div>
+      <div
+        className={`absolute top-8 left-8 w-2 h-2 bg-emerald-300 rounded-full transition-all duration-700 delay-100 ${
+          hover ? "opacity-100 scale-100" : "opacity-0 scale-0"
+        }`}
+      ></div>
     </div>
   );
 }

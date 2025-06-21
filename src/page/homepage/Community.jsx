@@ -1,26 +1,79 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
 import Navbar from "../../component/Navbar";
-import PostCard from "../../component/post";
 import Footer from "../../component/Footer";
 import { useNavigate } from "react-router-dom";
-
+import { UserContext } from "../../context/UserContext";
+import PostCard from "../../component/post";
+import HamsterLoader from "../../component/Loader";
 
 export default function Community() {
+  const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 6;
-  const totalPosts = 18; // Total number of posts to display
-  const totalPages = Math.ceil(totalPosts / cardsPerPage);
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
+        const { data } = await axios.get("http://localhost:5000/api/posts/get-posts", { headers });
+        setPosts(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        setError(err.response?.data?.message || "Failed to load posts");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [user]);
+
+  const totalPages = Math.ceil(posts.length / cardsPerPage);
+  const indexOfLast = currentPage * cardsPerPage;
+  const indexOfFirst = indexOfLast - cardsPerPage;
+  const currentPosts = posts.slice(indexOfFirst, indexOfLast);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  if (loading) {
+    return (     
+      <HamsterLoader size={14} />
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex justify-center items-center">
+          <div className="text-center">
+            <p className="text-red-500 text-lg">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-[#A0C878] text-white px-4 py-2 rounded-full"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative w-full h-[500px] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-400 opacity-90 z-10"></div>
@@ -32,8 +85,7 @@ export default function Community() {
             Share, Connect & Learn Together
           </h2>
           <p className="text-lg text-white max-w-2xl mb-8">
-            Join thousands of pet enthusiasts sharing stories, advice, and photos. 
-            From training tips to adoption stories, our community has it all!
+            Join thousands of pet enthusiasts sharing stories, advice, and photos.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <button className="bg-white text-emerald-600 hover:bg-emerald-50 px-8 py-3 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-xl">
@@ -53,7 +105,7 @@ export default function Community() {
             <h2 className="text-3xl font-bold text-gray-800">Community Posts</h2>
             <p className="text-gray-600 mt-2">Discover stories and tips from fellow pet lovers</p>
           </div>
-          
+
           <div className="mt-4 md:mt-0 flex gap-3">
             <div className="relative">
               <select className="appearance-none bg-white border border-gray-300 rounded-full pl-5 pr-10 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
@@ -64,14 +116,15 @@ export default function Community() {
                 <option>Pet Care</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                <svg className="fill-current h-4 w-4" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                 </svg>
               </div>
             </div>
-            <button 
-            onClick={() => navigate("/createpost")}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center">
+            <button
+              onClick={() => navigate("/createpost")}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
@@ -80,10 +133,10 @@ export default function Community() {
           </div>
         </div>
 
-        {/* Card Grid */}
+        {/* Post Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
-          {Array.from({ length: cardsPerPage }).map((_, index) => (
-            <PostCard key={index} />
+          {currentPosts.map(post => (
+            <PostCard key={post._id} post={post} />
           ))}
         </div>
 
@@ -94,77 +147,47 @@ export default function Community() {
               onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
-                currentPage === 1 
-                  ? "text-gray-400 cursor-not-allowed" 
+                currentPage === 1
+                  ? "text-gray-400 cursor-not-allowed"
                   : "text-gray-700 hover:bg-emerald-100 hover:text-emerald-700"
               }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </button>
-            
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, index) => {
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = index + 1;
-              } else if (currentPage <= 3) {
-                pageNum = index + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + index;
-              } else {
-                pageNum = currentPage - 2 + index;
-              }
-              
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => handlePageChange(pageNum)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    currentPage === pageNum
-                      ? "bg-emerald-500 text-white shadow-md"
-                      : "text-gray-700 hover:bg-emerald-100"
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-            
-            {totalPages > 5 && currentPage < totalPages - 2 && (
-              <span className="px-2 text-gray-500">...</span>
-            )}
-            
-            {totalPages > 5 && currentPage < totalPages - 2 && (
+
+            {Array.from({ length: totalPages }, (_, i) => (
               <button
-                onClick={() => handlePageChange(totalPages)}
+                key={i + 1}
+                onClick={() => handlePageChange(i + 1)}
                 className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  currentPage === totalPages
+                  currentPage === i + 1
                     ? "bg-emerald-500 text-white shadow-md"
                     : "text-gray-700 hover:bg-emerald-100"
                 }`}
               >
-                {totalPages}
+                {i + 1}
               </button>
-            )}
-            
+            ))}
+
             <button
               onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
-                currentPage === totalPages 
-                  ? "text-gray-400 cursor-not-allowed" 
+                currentPage === totalPages
+                  ? "text-gray-400 cursor-not-allowed"
                   : "text-gray-700 hover:bg-emerald-100 hover:text-emerald-700"
               }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </button>
           </div>
         </div>
       </main>
-      
+
       {/* CTA Section */}
       <section className="bg-emerald-50 py-16 mt-12">
         <div className="max-w-4xl mx-auto text-center px-4">
@@ -182,8 +205,7 @@ export default function Community() {
           </div>
         </div>
       </section>
-      
-      {/* Footer */}
+
       <Footer />
     </div>
   );

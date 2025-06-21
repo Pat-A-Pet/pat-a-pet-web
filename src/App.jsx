@@ -11,24 +11,28 @@ import CreateAdoption from "./page/homepage/AdoptionPost";
 import ChatPage from "./page/homepage/Chat";
 import LandingPage from "./page/LandingPage";
 import EditAdoption from "./page/homepage/EditAdoption";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage/>} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/listing" element={<Listing />} />
-        <Route path="/petdetail" element={<PetDetail />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/myhub" element={<MyHub />} />
-        <Route path="/createadopt" element={<CreateAdoption />} />
-        <Route path="/editadopt" element={<EditAdoption />} />
-        <Route path="/createpost" element={<PostCreationPage />} />
-        <Route path="/chat" element={<ChatPage />} />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/listing" element={<Listing />} />
+          <Route path="/petdetail/:id" element={<PetDetail />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/myhub" element={<MyHub />} />
+          <Route path="/createadopt" element={<CreateAdoption />} />
+          <Route path="/editadopt/:id" element={<EditAdoption />} />
+          <Route path="/createpost" element={<PostCreationPage />} />
+          <Route path="/chat/" element={<ChatPage/>}/>
+          <Route path="/chat/:channelId" element={<ChatPage/>}/>
+        </Routes>
+      </UserProvider>
     </Router>
   );
 }

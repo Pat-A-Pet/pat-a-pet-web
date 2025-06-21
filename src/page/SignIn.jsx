@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-// import axios from "axios";
+import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -9,27 +11,27 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { fetchUser } = useContext(UserContext);
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Supaya tidak reload halaman
-    // try {
-    //   const response = await axios.post("http://localhost:5000/api/auth/signin", {
-    //     email,
-    //     password,
-    //   });
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:5000/api/auth/signin", {
+      email,
+      password,
+    });
 
-    //   const { token, user } = response.data;
+    const { token } = response.data;
 
-    //   localStorage.setItem("token", token);
+    localStorage.setItem("token", token);
+    await fetchUser(); // ✅ fetch user data into context
 
-    //   localStorage.setItem("user", JSON.stringify(user));
-
-    // } catch (err) {
-    //   console.error(err.response?.data?.error || err.message);
-    //   setError(err.response?.data?.error || "Something went wrong");
-    // }
     navigate("/home");
-  };
+  } catch (err) {
+    console.error(err.response?.data?.error || err.message);
+    setError(err.response?.data?.error || "Something went wrong");
+  }
+};
 
   return (
     <div className="flex h-screen w-full bg-[#A0C878]">
@@ -65,7 +67,8 @@ export default function SignIn() {
             Welcome back <br /> Pawrents
           </h1>
           <hr className="border-white w-20 my-4" />
-          <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p>
+          {/* <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p> */}
+          <p className="text-lg">Connecting pets with loving homes, faster and simpler than ever.</p>
         </div>
       </div>
 

@@ -1,36 +1,44 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiArrowLeft, FiImage, FiTag, FiMapPin, FiDollarSign, FiInfo, FiHeart, FiCalendar, FiX, FiCheck } from "react-icons/fi";
+import { FaDog, FaCat } from "react-icons/fa";
+import { GiTortoise } from "react-icons/gi";
 import Navbar from "../../component/Navbar";
 import Footer from "../../component/Footer";
+import axios from "axios";
+import { UserContext } from "../../context/UserContext";
 
 const CreateAdoption = () => {
+  const { user } = useContext(UserContext);
   const [step, setStep] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+  
+  const MAX_STEPS = 3;
+  const progressPercentage = (step / MAX_STEPS) * 100;
+
   const [formData, setFormData] = useState({
     name: "",
     breed: "",
+    species: "Dog",
     age: "",
     gender: "",
-    size: "",
     color: "",
     weight: "",
     vaccinated: false,
     neutered: false,
     microchipped: false,
     description: "",
-    traits: [],
+    // traits: [],
     currentTrait: "",
-    medicalHistory: "",
+    // medicalHistory: "",
     adoptionFee: "",
     location: "",
-    images: []
+    images: [],
+    files: []
   });
-  
-  const fileInputRef = useRef(null);
-  const MAX_STEPS = 3;
-  const progressPercentage = (step / MAX_STEPS) * 100;
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,80 +48,179 @@ const CreateAdoption = () => {
     }));
   };
 
-  const handleAddTrait = () => {
-    if (formData.currentTrait.trim() && formData.traits.length < 5) {
-      setFormData(prev => ({
-        ...prev,
-        traits: [...prev.traits, prev.currentTrait.trim()],
-        currentTrait: ""
-      }));
-    }
-  };
+  // const handleAddTrait = () => {
+  //   if (formData.currentTrait.trim() && formData.traits.length < 5) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       traits: [...prev.traits, prev.currentTrait.trim()],
+  //       currentTrait: ""
+  //     }));
+  //   }
+  // };
 
-  const handleRemoveTrait = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      traits: prev.traits.filter((_, i) => i !== index)
-    }));
-  };
+  // const handleRemoveTrait = (index) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     traits: prev.traits.filter((_, i) => i !== index)
+  //   }));
+  // };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
+    if (files.length + formData.images.length > 6) {
+      setError("Maximum 6 images allowed");
+      return;
+    }
+    
     setIsUploading(true);
     
-    // Simulate upload process
-    setTimeout(() => {
-      const newImages = files.map(file => URL.createObjectURL(file));
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, ...newImages].slice(0, 6) // Limit to 6 images
-      }));
-      setIsUploading(false);
-    }, 1000);
+    const newImages = files.map(file => ({
+      preview: URL.createObjectURL(file),
+      file
+    }));
+    
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, ...newImages].slice(0, 6),
+      files: [...prev.files, ...files].slice(0, 6)
+    }));
+    
+    setIsUploading(false);
+    setError(null);
   };
 
   const removeImage = (index) => {
+    URL.revokeObjectURL(formData.images[index].preview);
+    
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
+      files: prev.files.filter((_, i) => i !== index)
     }));
   };
 
-  const handleSubmit = (e) => {
+  const uploadImagesToCloudinary = async () => {
+    try {
+      const formDataForUpload = new FormData();
+      
+      formData.files.forEach(file => {
+        formDataForUpload.append('images', file);
+      });
+      
+      const response = await axios.post(
+        "http://localhost:5000/api/pets/upload-pet-images",
+        formDataForUpload,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+      
+      return response.data.images.map(img => img.url);
+    } catch (err) {
+      console.error("Image upload error:", err);
+      throw new Error(err.response?.data?.error || "Failed to upload images");
+    }
+  };
+
+  const createPetListing = async (imageUrls) => {
+    try {
+      const cleanAdoptionFee = formData.adoptionFee.replace(/[^0-9.]/g, '');
+      
+      const payload = {
+        name: formData.name,
+        breed: formData.breed,
+        age: parseFloat(formData.age) || 0,
+        gender: formData.gender,
+        color: formData.color,
+        weight: formData.weight,
+        vaccinated: formData.vaccinated,
+        neutered: formData.neutered,
+        microchipped: formData.microchipped,
+        description: formData.description,
+        // traits: formData.traits,
+        // medicalHistory: formData.medicalHistory,
+        adoptionFee: parseFloat(cleanAdoptionFee) || 0,
+        location: formData.location,
+        imageUrls,
+        species: formData.species
+      };
+      
+      await axios.post(
+        "http://localhost:5000/api/pets/create-listing",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+    } catch (err) {
+      console.error("Listing creation error:", err);
+      throw new Error(err.response?.data?.error || "Failed to create listing");
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     setIsUploading(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      console.log("Adoption Post Created:", formData);
-      setIsUploading(false);
+    try {
+      const imageUrls = formData.files.length > 0 
+        ? await uploadImagesToCloudinary() 
+        : [];
+      
+      await createPetListing(imageUrls);
+      
       setIsSubmitted(true);
       
-      // Reset form after submission if needed
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({
           name: "",
           breed: "",
+          species: "Dog",
           age: "",
           gender: "",
-          size: "",
           color: "",
           weight: "",
           vaccinated: false,
           neutered: false,
           microchipped: false,
           description: "",
-          traits: [],
+          // traits: [],
           currentTrait: "",
-          medicalHistory: "",
+          // medicalHistory: "",
           adoptionFee: "",
           location: "",
-          images: []
+          images: [],
+          files: []
         });
         setStep(1);
+        
+        formData.images.forEach(image => {
+          URL.revokeObjectURL(image.preview);
+        });
       }, 3000);
-    }, 1500);
+    } catch (err) {
+      console.error("Submission error:", err);
+      setError(err.message || "Failed to create adoption post");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Species icon mapping
+  const getSpeciesIcon = (species) => {
+    switch(species) {
+      case "Dog": return <FaDog className="inline mr-2 text-gray-700" />;
+      case "Cat": return <FaCat className="inline mr-2 text-gray-700" />;
+      case "Turtle": return <GiTortoise className="inline mr-2 text-gray-700" />;
+      default: return null;
+    }
   };
 
   return (
@@ -122,7 +229,6 @@ const CreateAdoption = () => {
       
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white mt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
           <div className="mb-8">
             <button 
               onClick={() => window.history.back()}
@@ -167,7 +273,13 @@ const CreateAdoption = () => {
             </div>
           </div>
           
-          {/* Form Content */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center">
+              <FiInfo className="mr-2 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+          
           <motion.div 
             className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100"
             initial={{ opacity: 0, y: 20 }}
@@ -264,6 +376,29 @@ const CreateAdoption = () => {
                             
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Species *
+                              </label>
+                              <select
+                                name="species"
+                                value={formData.species}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                              >
+                                <option value="Dog">
+                                  <FaDog className="inline mr-2" /> Dog
+                                </option>
+                                <option value="Cat">
+                                  <FaCat className="inline mr-2" /> Cat
+                                </option>
+                                <option value="Turtle">
+                                  <GiTortoise className="inline mr-2" /> Turtle
+                                </option>
+                              </select>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Age *
                               </label>
                               <input
@@ -294,24 +429,6 @@ const CreateAdoption = () => {
                               </select>
                             </div>
                             
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Size *
-                              </label>
-                              <select
-                                name="size"
-                                value={formData.size}
-                                onChange={handleInputChange}
-                                required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                              >
-                                <option value="">Select size</option>
-                                <option value="Small">Small</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Large">Large</option>
-                                <option value="Extra Large">Extra Large</option>
-                              </select>
-                            </div>
                             
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -345,14 +462,14 @@ const CreateAdoption = () => {
                         </div>
                         
                         <div className="flex justify-between">
-                          <div></div> {/* Empty div for spacing */}
+                          <div></div>
                           <motion.button
                             type="button"
                             onClick={() => setStep(2)}
                             className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
-                            disabled={!formData.name || !formData.breed || !formData.age || !formData.gender || !formData.size || !formData.color}
+                            disabled={!formData.name || !formData.breed || !formData.age || !formData.gender || !formData.color}
                           >
                             Next: Health & Traits
                             <FiArrowLeft className="transform rotate-180" />
@@ -406,7 +523,7 @@ const CreateAdoption = () => {
                             ))}
                           </div>
                           
-                          <div className="mb-8">
+                          {/* <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Medical History
                             </label>
@@ -418,9 +535,9 @@ const CreateAdoption = () => {
                               className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                               placeholder="Describe any medical conditions or treatments..."
                             ></textarea>
-                          </div>
+                          </div> */}
                           
-                          <div className="mb-8">
+                          {/* <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Personality Traits
                             </label>
@@ -462,7 +579,7 @@ const CreateAdoption = () => {
                                 Add
                               </button>
                             </div>
-                          </div>
+                          </div> */}
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -537,7 +654,7 @@ const CreateAdoption = () => {
                                   className="relative group"
                                 >
                                   <img 
-                                    src={img} 
+                                    src={img.preview} 
                                     alt={`Preview ${index}`} 
                                     className="w-full h-40 object-cover rounded-xl border border-gray-200"
                                   />
@@ -681,7 +798,6 @@ const CreateAdoption = () => {
           </motion.div>
         </div>
         
-        {/* Stats Section */}
         <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white py-12 mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

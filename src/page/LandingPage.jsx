@@ -81,10 +81,10 @@ export default function LandingPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center mt-8">
-            <Card showHeart={true}/>
-            <Card showHeart={true} />
-            <Card showHeart={true} />
-            <Card showHeart={false} />
+            <Card />
+            <Card />
+            <Card />
+            <Card />
         </div>
         </main>
 

@@ -1,25 +1,125 @@
-import React, { useState } from "react";
-import { Heart, MessageCircle, Share2, MoreHorizontal, Bookmark } from "lucide-react";
+import React, { useState, useContext, useEffect } from "react";
+import { 
+  Heart, 
+  MessageCircle, 
+  Share2, 
+  MoreHorizontal, 
+  Bookmark, 
+  ChevronLeft, 
+  ChevronRight 
+} from "lucide-react";
+import axios from "axios";
+import { UserContext } from "../context/UserContext";
 
-export default function PostCard() {
-  const [liked, setLiked] = useState(false);
+export default function PostCard({ post }) {
   const [bookmarked, setBookmarked] = useState(false);
-  const [likeCount, setLikeCount] = useState(127);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { user } = useContext(UserContext);
+  const [comments, setComments] = useState(post?.comments || []);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post?.loves?.length || 0);
+  const [isLiking, setIsLiking] = useState(false);
+  const [isCommenting, setIsCommenting] = useState(false);
+  
+  // Use post images if available, otherwise default images
+  const postImages = post?.imageUrls?.length > 0 
+    ? post.imageUrls 
+    : ["/german.webp", "/dog2.jpg", "/dog3.jpg", "/dog4.jpg"];
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+  // Initialize liked state based on whether user has already liked the post
+  useEffect(() => {
+    if (!user?._id || !post?.loves) return;
+    
+    // Convert both IDs to strings for reliable comparison
+    const userId = user._id.toString();
+    const userLiked = post.loves.some(loveId => 
+      loveId && loveId.toString() === userId
+    );
+    
+    setLiked(userLiked);
+  }, [user, post]);
+
+  const handleLike = async () => {
+    if (!user || !user.token) {
+      alert("Please login to like posts");
+      return;
+    }
+
+    try {
+      setIsLiking(true);
+      // Optimistic UI update
+      setLiked(!liked);
+      setLikeCount(prev => liked ? prev - 1 : prev + 1);
+
+      const headers = {
+        Authorization: `Bearer ${user.token}`
+      };
+
+      await axios.post(
+        `http://localhost:5000/api/posts/post-love/${post._id}`,
+        {},
+        { headers }
+      );
+    } catch (err) {
+      console.error("Error liking post:", err);
+      // Revert on error
+      setLiked(prev => !prev);
+      setLikeCount(prev => liked ? prev + 1 : prev - 1);
+      alert("Failed to like post");
+    } finally {
+      setIsLiking(false);
+    }
   };
 
-  const handleComment = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (newComment.trim()) {
-      // Here you would typically add the comment to your data
-      console.log("New comment:", newComment);
-      setNewComment("");
+    
+    if (!newComment.trim()) return;
+    if (!user || !user.token) {
+      alert("Please login to comment");
+      return;
     }
+
+    try {
+      setIsCommenting(true);
+      const headers = {
+        Authorization: `Bearer ${user.token}`
+      };
+
+      const response = await axios.post(
+        `http://localhost:5000/api/posts/post-comments/${post._id}`,
+        { comment: newComment },
+        { headers }
+      );
+
+      // Update comments from response
+      if (response.data.comments) {
+        setComments(response.data.comments);
+      } else if (response.data) {
+        setComments(response.data.comments || []);
+      }
+      
+      setNewComment("");
+    } catch (err) {
+      console.error("Error posting comment:", err);
+      alert("Failed to post comment");
+    } finally {
+      setIsCommenting(false);
+    }
+  };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === postImages.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === 0 ? postImages.length - 1 : prevIndex - 1
+    );
   };
 
   return (
@@ -30,15 +130,17 @@ export default function PostCard() {
           <div className="flex items-center gap-3">
             <div className="relative">
               <img
-                src="german.webp"
-                alt="Sarah Johnson"
+                src={post?.author?.profilePicture || "/default-profile.png"}
+                alt={post?.author?.fullname || "User"}
                 className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-100"
               />
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">Sarah Johnson</h3>
-              <p className="text-gray-500 text-xs">2 hours ago •</p>
+              <h3 className="font-semibold text-gray-900 text-sm">{post?.author?.fullname || "Anonymous"}</h3>
+              <p className="text-gray-500 text-xs">
+                {new Date(post?.createdAt).toLocaleString()} • 
+              </p>
             </div>
           </div>
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -49,27 +151,51 @@ export default function PostCard() {
         {/* Post Content */}
         <div className="p-4">
           <p className="text-gray-800 text-sm leading-relaxed mb-3">
-            Just finished an amazing hiking trip in Yosemite! 🏔️ The sunrise from Half Dome was absolutely breathtaking. Nothing beats connecting with nature and pushing your limits. Who else loves adventure travel? 
+            {post?.captions || "No caption provided"}
           </p>
           
-          {/* Post Image */}
-          <div className="relative rounded-xl overflow-hidden mb-3 group cursor-pointer">
-            <img
-              // src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
-              src="/german.webp"
-              alt="Dog"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </div>
-
-          {/* Tags */}
-          <div className="flex gap-2 mb-4">
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">#Training Tips</span>
-            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">#Pet Care</span>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">#Adoption Stories</span>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">#Health & Nutrition</span>
-          </div>
+          {/* Post Images Carousel */}
+          {postImages.length > 0 && (
+            <div className="relative rounded-xl overflow-hidden mb-3 group cursor-pointer">
+              <img
+                src={postImages[currentImageIndex]}
+                alt={`Post ${currentImageIndex + 1}`}
+                className="w-full h-64 object-cover transition-all duration-500"
+              />
+              
+              {postImages.length > 1 && (
+                <>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+              
+              {postImages.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {postImages.map((_, index) => (
+                    <div 
+                      key={index}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentImageIndex 
+                          ? "bg-white w-3" 
+                          : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Actions Bar */}
@@ -78,6 +204,7 @@ export default function PostCard() {
             <div className="flex items-center gap-4">
               <button
                 onClick={handleLike}
+                disabled={isLiking}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                   liked 
                     ? 'text-red-500 bg-red-50 hover:bg-red-100' 
@@ -85,7 +212,9 @@ export default function PostCard() {
                 }`}
               >
                 <Heart className={`w-5 h-5 transition-all duration-200 ${liked ? 'fill-current scale-110' : ''}`} />
-                <span className="text-sm font-medium">{likeCount}</span>
+                <span className="text-sm font-medium">
+                  {isLiking ? '...' : likeCount}
+                </span>
               </button>
 
               <button
@@ -93,7 +222,7 @@ export default function PostCard() {
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
               >
                 <MessageCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">24</span>
+                <span className="text-sm font-medium">{comments.length}</span>
               </button>
 
               <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-green-500 hover:bg-green-50 transition-all duration-200">
@@ -118,43 +247,40 @@ export default function PostCard() {
         {/* Comments Section */}
         {showComments && (
           <div className="px-4 pb-4 border-t border-gray-100 mt-2">
-            {/* Sample Comments */}
+            {/* Existing Comments */}
             <div className="space-y-3 mt-4">
-              <div className="flex gap-3">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face"
-                  alt="Mike Chen"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-lg px-3 py-2">
-                    <p className="font-medium text-sm text-gray-900">Mike Chen</p>
-                    <p className="text-sm text-gray-700">Amazing shot! I've been wanting to do this hike for years 🔥</p>
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id || comment.author._id} className="flex gap-3">
+                    <img
+                      src={comment.author.profilePicture || "/default-profile.png"}
+                      alt={comment.author.fullname}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="bg-gray-100 rounded-lg px-3 py-2">
+                        <p className="font-medium text-sm text-gray-900">
+                          {comment.author.fullname}
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          {comment.comment || comment.text}
+                        </p>
+                      </div>
+                      <button className="text-xs text-gray-500 mt-1 hover:text-gray-700">
+                        Reply
+                      </button>
+                    </div>
                   </div>
-                  <button className="text-xs text-gray-500 mt-1 hover:text-gray-700">Reply</button>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <img
-                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face"
-                  alt="Emma Wilson"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-lg px-3 py-2">
-                    <p className="font-medium text-sm text-gray-900">Emma Wilson</p>
-                    <p className="text-sm text-gray-700">The sunrise looks incredible! What time did you start the hike?</p>
-                  </div>
-                  <button className="text-xs text-gray-500 mt-1 hover:text-gray-700">Reply</button>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm text-center py-2">No comments yet</p>
+              )}
             </div>
 
-            {/* Add Comment */}
-            <div className="flex gap-3 mt-4">
+            {/* Add Comment Form */}
+            <form onSubmit={handleCommentSubmit} className="flex gap-3 mt-4">
               <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
+                src={user?.profilePicture || "/default-profile.png"}
                 alt="You"
                 className="w-8 h-8 rounded-full object-cover"
               />
@@ -163,20 +289,20 @@ export default function PostCard() {
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleComment(e)}
                   placeholder="Write a comment..."
                   className="w-full px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-all"
                 />
                 {newComment && (
                   <button
-                    onClick={handleComment}
+                    type="submit"
+                    disabled={isCommenting}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-700 font-medium text-sm"
                   >
-                    Post
+                    {isCommenting ? 'Posting...' : 'Send'}
                   </button>
                 )}
               </div>
-            </div>
+            </form>
           </div>
         )}
       </div>

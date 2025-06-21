@@ -52,7 +52,7 @@ const Navbar = () => {
       >
         {/* Left: Animated Logo */}
         <div className="flex-1">
-          <Link to="/" className="text-2xl font-bold text-gray-800 dark:text-white">
+          <Link to="/home" className="text-2xl font-bold text-gray-800 dark:text-white">
             <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

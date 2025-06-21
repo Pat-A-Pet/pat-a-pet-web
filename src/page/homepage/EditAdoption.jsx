@@ -1,76 +1,101 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiImage, FiTag, FiMapPin, FiDollarSign, FiInfo, FiHeart, FiCalendar, FiX, FiCheck, FiEdit, FiTrash2 } from "react-icons/fi";
 import Navbar from "../../component/Navbar";
 import Footer from "../../component/Footer";
+import axios from "axios";
+import { UserContext } from "../../context/UserContext";
 
 const EditAdoption = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
   const [step, setStep] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [originalData, setOriginalData] = useState(null);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+  
+  const MAX_STEPS = 3;
+  const progressPercentage = (step / MAX_STEPS) * 100;
+
   const [formData, setFormData] = useState({
     name: "",
     breed: "",
+    species: "Dog",
     age: "",
     gender: "",
-    size: "",
     color: "",
     weight: "",
     vaccinated: false,
     neutered: false,
     microchipped: false,
     description: "",
-    traits: [],
+    // traits: [],
     currentTrait: "",
-    medicalHistory: "",
+    // medicalHistory: "",
     adoptionFee: "",
     location: "",
-    images: []
+    existingImages: [],   // Original image URLs from backend
+    keptImages: [],       // Existing images that are kept
+    newFiles: []          // New files to be uploaded
   });
-  
-  const fileInputRef = useRef(null);
-  const MAX_STEPS = 3;
-  const progressPercentage = (step / MAX_STEPS) * 100;
 
-  // Simulate loading existing data
+  // Fetch existing pet data
   useEffect(() => {
-    // In a real app, this would come from an API
-    setIsUploading(true);
-    setTimeout(() => {
-      setOriginalData({
-        id: "post-123",
-        createdAt: "2025-05-15",
-        views: 124,
-        inquiries: 8
-      });
-      
-      setFormData({
-        name: "Max",
-        breed: "German Shepherd",
-        age: "3 years",
-        gender: "Male",
-        size: "Large",
-        color: "Black & Tan",
-        weight: "28 kg",
-        vaccinated: true,
-        neutered: true,
-        microchipped: true,
-        description: "Max is a loyal, intelligent, and energetic German Shepherd looking for his forever home. He's well-trained, great with families, and loves outdoor activities. Max would thrive in an active household where he can get plenty of exercise and mental stimulation.",
-        traits: ["Loyal", "Energetic", "Intelligent", "Friendly", "Protective"],
-        medicalHistory: "Up to date on all vaccinations, regular vet checkups, no known health issues.",
-        adoptionFee: "$250",
-        location: "San Francisco, CA",
-        images: [
-          "/german.webp",
-          "/dog2.jpg",
-          "/dog3.jpg"
-        ]
-      });
-      
-      setIsUploading(false);
-    }, 800);
-  }, []);
+    const fetchPetData = async () => {
+      try {
+        setIsUploading(true);
+        const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
+        
+        const response = await axios.get(
+          `http://localhost:5000/api/pets/get-listing/${id}`,
+          { headers }
+        );
+        
+        const petData = response.data.pet;
+        setOriginalData({
+          id: petData._id,
+          createdAt: petData.createdAt,
+          views: petData.views || 0,
+          inquiries: petData.inquiries || 0
+        });
+        
+        setFormData({
+          name: petData.name,
+          breed: petData.breed,
+          species: petData.category || "Dog",
+          age: petData.age.toString(),
+          gender: petData.gender,
+          color: petData.color,
+          weight: petData.weight,
+          vaccinated: petData.vaccinated,
+          neutered: petData.neutered,
+          microchipped: petData.microchipped,
+          description: petData.description,
+          // traits: petData.traits || [],
+          currentTrait: "",
+          // medicalHistory: petData.medicalHistory || "",
+          adoptionFee: petData.adoptionFee ? `$${petData.adoptionFee}` : "",
+          location: petData.location,
+          existingImages: petData.imageUrls || [],
+          keptImages: [...petData.imageUrls], // Start with all images kept
+          newFiles: []
+        });
+        
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching pet data:", err);
+        setError(err.response?.data?.error || "Failed to load pet data");
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    if (id) fetchPetData();
+  }, [id, user]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -80,74 +105,180 @@ const EditAdoption = () => {
     }));
   };
 
-  const handleAddTrait = () => {
-    // Fixed: Added null/undefined check before trim()
-    if (formData.currentTrait && formData.currentTrait.trim() && formData.traits.length < 5) {
-      setFormData(prev => ({
-        ...prev,
-        traits: [...prev.traits, prev.currentTrait.trim()],
-        currentTrait: ""
-      }));
-    }
-  };
+  // const handleAddTrait = () => {
+  //   if (formData.currentTrait && formData.currentTrait.trim() && formData.traits.length < 5) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       traits: [...prev.traits, prev.currentTrait.trim()],
+  //       currentTrait: ""
+  //     }));
+  //   }
+  // };
 
-  const handleRemoveTrait = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      traits: prev.traits.filter((_, i) => i !== index)
-    }));
-  };
+  // const handleRemoveTrait = (index) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     traits: prev.traits.filter((_, i) => i !== index)
+  //   }));
+  // };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    setIsUploading(true);
+    if (files.length + formData.keptImages.length + formData.newFiles.length > 6) {
+      setError("Maximum 6 images allowed");
+      return;
+    }
     
-    // Simulate upload process
-    setTimeout(() => {
-      const newImages = files.map(file => URL.createObjectURL(file));
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, ...newImages].slice(0, 6) // Limit to 6 images
-      }));
-      setIsUploading(false);
-    }, 1000);
-  };
-
-  const removeImage = (index) => {
+    // Create preview URLs and store files
+    const newImages = files.map(file => ({
+      preview: URL.createObjectURL(file),
+      file
+    }));
+    
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      newFiles: [...prev.newFiles, ...newImages].slice(0, 6)
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsUploading(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      console.log("Adoption Post Updated:", formData);
-      setIsUploading(false);
-      setIsSubmitted(true);
-      
-      // Reset form after submission if needed
-      setTimeout(() => {
-        setIsSubmitted(false);
-      }, 3000);
-    }, 1500);
+  const removeImage = (image, type) => {
+    if (type === 'existing') {
+      // Remove from keptImages
+      setFormData(prev => ({
+        ...prev,
+        keptImages: prev.keptImages.filter(img => img !== image)
+      }));
+    } else if (type === 'new') {
+      // Remove from newFiles and revoke object URL
+      setFormData(prev => {
+        const newFiles = prev.newFiles.filter(item => item.preview !== image);
+        URL.revokeObjectURL(image);
+        return { ...prev, newFiles };
+      });
+    }
   };
 
-  const handleDeletePost = () => {
-    if (window.confirm("Are you sure you want to delete this adoption post? This action cannot be undone.")) {
-      setIsUploading(true);
-      // Simulate delete process
-      setTimeout(() => {
-        console.log("Post deleted");
-        setIsUploading(false);
-        // Redirect or show success message
-        window.location.href = "/my-hub";
-      }, 1200);
+  const uploadNewImages = async () => {
+    try {
+      if (formData.newFiles.length === 0) return [];
+      
+      const formDataForUpload = new FormData();
+      
+      // Append all new files to form data
+      formData.newFiles.forEach(item => {
+        formDataForUpload.append('images', item.file);
+      });
+      
+      // Upload images with auth headers
+      const response = await axios.post(
+        "http://localhost:5000/api/pets/upload-pet-images",
+        formDataForUpload,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+      
+      return response.data.images.map(img => img.url);
+    } catch (err) {
+      console.error("Image upload error:", err);
+      throw new Error(err.response?.data?.error || "Failed to upload images");
     }
+  };
+
+  const updatePetListing = async (newImageUrls) => {
+    try {
+      // Clean adoption fee - remove non-numeric characters
+      const cleanAdoptionFee = formData.adoptionFee.replace(/[^0-9.]/g, '');
+      
+      // Prepare data for backend
+      const payload = {
+        name: formData.name,
+        breed: formData.breed,
+        category: formData.species,
+        age: parseFloat(formData.age) || 0,
+        gender: formData.gender,
+        color: formData.color,
+        weight: formData.weight,
+        vaccinated: formData.vaccinated,
+        neutered: formData.neutered,
+        microchipped: formData.microchipped,
+        description: formData.description,
+        // traits: formData.traits,
+        // medicalHistory: formData.medicalHistory,
+        adoptionFee: parseFloat(cleanAdoptionFee) || 0,
+        location: formData.location,
+        imageUrls: [...formData.keptImages, ...newImageUrls]
+      };
+      
+      // Update listing with authorization
+      await axios.put(
+        `http://localhost:5000/api/pets/update-listing/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+    } catch (err) {
+      console.error("Listing update error:", err);
+      throw new Error(err.response?.data?.error || "Failed to update listing");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsUploading(true);
+    
+    try {
+      // 1. Upload new images to Cloudinary
+      const newImageUrls = await uploadNewImages();
+      
+      // 2. Update the pet listing
+      await updatePetListing(newImageUrls);
+      
+      // 3. Show success
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      setError(err.message || "Failed to update adoption post");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeletePost = async () => {
+  if (!window.confirm("Are you sure you want to delete this adoption post?")) return;
+  
+  try {
+    setIsUploading(true);
+    await axios.delete(
+      `http://localhost:5000/api/pets/delete-listing/${id}`,  // Use the route param id
+      {
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        }
+      }
+    );
+    
+    alert("Post deleted successfully!");
+    navigate('/home');  // Redirect after deletion
+  } catch (err) {
+    console.error("Listing delete error:", err);
+    setError(err.response?.data?.error || "Failed to delete listing");
+  } finally {
+    setIsUploading(false);
+  }
+};
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   if (isUploading && !originalData) {
@@ -184,6 +315,37 @@ const EditAdoption = () => {
     );
   }
 
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
+          <div className="text-center max-w-md p-6 bg-white rounded-xl shadow-lg">
+            <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <FiHeart className="w-8 h-8 text-red-500" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Error Loading Post</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="flex justify-center gap-3">
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors"
+              >
+                Try Again
+              </button>
+              <button 
+                onClick={() => navigate("/my-hub")}
+                className="px-6 py-3 border-2 border-green-500 text-green-600 rounded-xl font-medium hover:bg-green-50 transition-colors"
+              >
+                Back to Hub
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -194,7 +356,7 @@ const EditAdoption = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <button 
-                onClick={() => window.history.back()}
+                onClick={() => navigate(-1)}
                 className="flex items-center text-emerald-600 hover:text-emerald-800 font-medium"
               >
                 <FiArrowLeft className="mr-2" /> Back
@@ -242,18 +404,27 @@ const EditAdoption = () => {
                     whileTap={{ scale: 0.98 }}
                     className="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-xl font-medium flex items-center gap-2"
                     onClick={handleDeletePost}
+                    disabled={isUploading}
                   >
                     <FiTrash2 className="w-4 h-4" />
                     Delete Post
                   </motion.button>
                   <div className="text-sm text-gray-500">
-                    <div>Posted: {originalData.createdAt}</div>
+                    <div>Posted: {formatDate(originalData.createdAt)}</div>
                     <div>Views: {originalData.views} • Inquiries: {originalData.inquiries}</div>
                   </div>
                 </div>
               )}
             </div>
           </div>
+          
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center">
+              <FiInfo className="mr-2 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
           
           {/* Form Content */}
           <motion.div 
@@ -294,6 +465,7 @@ const EditAdoption = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="px-6 py-3 border-2 border-emerald-500 text-emerald-600 rounded-xl font-medium hover:bg-emerald-50 transition-colors"
+                        onClick={() => navigate(`/pet/${id}`)}
                       >
                         View Post
                       </motion.button>
@@ -352,6 +524,23 @@ const EditAdoption = () => {
                             
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Species *
+                              </label>
+                              <select
+                                name="species"
+                                value={formData.species}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                              >
+                                <option value="Dog">Dog</option>
+                                <option value="Cat">Cat</option>
+                                <option value="Turtle">Turtle</option>
+                              </select>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Age *
                               </label>
                               <input
@@ -382,24 +571,6 @@ const EditAdoption = () => {
                               </select>
                             </div>
                             
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Size *
-                              </label>
-                              <select
-                                name="size"
-                                value={formData.size}
-                                onChange={handleInputChange}
-                                required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                              >
-                                <option value="">Select size</option>
-                                <option value="Small">Small</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Large">Large</option>
-                                <option value="Extra Large">Extra Large</option>
-                              </select>
-                            </div>
                             
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -433,14 +604,14 @@ const EditAdoption = () => {
                         </div>
                         
                         <div className="flex justify-between">
-                          <div></div> {/* Empty div for spacing */}
+                          <div></div>
                           <motion.button
                             type="button"
                             onClick={() => setStep(2)}
                             className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
-                            disabled={!formData.name || !formData.breed || !formData.age || !formData.gender || !formData.size || !formData.color}
+                            disabled={!formData.name || !formData.breed || !formData.age || !formData.gender || !formData.color}
                           >
                             Next: Health & Traits
                             <FiArrowLeft className="transform rotate-180" />
@@ -494,7 +665,7 @@ const EditAdoption = () => {
                             ))}
                           </div>
                           
-                          <div className="mb-8">
+                          {/* <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Medical History
                             </label>
@@ -506,9 +677,9 @@ const EditAdoption = () => {
                               className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                               placeholder="Describe any medical conditions or treatments..."
                             ></textarea>
-                          </div>
+                          </div> */}
                           
-                          <div className="mb-8">
+                          {/* <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Personality Traits
                             </label>
@@ -550,7 +721,7 @@ const EditAdoption = () => {
                                 Add
                               </button>
                             </div>
-                          </div>
+                          </div> */}
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -613,21 +784,26 @@ const EditAdoption = () => {
                           
                           <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Upload Photos (Up to 6)
+                              Current Photos
                             </label>
                             
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
-                              {formData.images.map((img, index) => (
+                              {/* Existing images */}
+                              {formData.keptImages.map((img, index) => (
                                 <motion.div
-                                  key={index}
+                                  key={`existing-${index}`}
                                   initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   className="relative group"
                                 >
-                                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-40" />
+                                  <img 
+                                    src={img} 
+                                    alt={`Preview ${index}`} 
+                                    className="w-full h-40 object-cover rounded-xl border border-gray-200"
+                                  />
                                   <button
                                     type="button"
-                                    onClick={() => removeImage(index)}
+                                    onClick={() => removeImage(img, 'existing')}
                                     className="absolute top-2 right-2 bg-white/80 hover:bg-white p-1 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100"
                                   >
                                     <FiX className="w-4 h-4 text-gray-800" />
@@ -635,7 +811,31 @@ const EditAdoption = () => {
                                 </motion.div>
                               ))}
                               
-                              {formData.images.length < 6 && (
+                              {/* New images */}
+                              {formData.newFiles.map((img, index) => (
+                                <motion.div
+                                  key={`new-${index}`}
+                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  className="relative group"
+                                >
+                                  <img 
+                                    src={img.preview} 
+                                    alt={`Preview ${index}`} 
+                                    className="w-full h-40 object-cover rounded-xl border border-gray-200"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeImage(img.preview, 'new')}
+                                    className="absolute top-2 right-2 bg-white/80 hover:bg-white p-1 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100"
+                                  >
+                                    <FiX className="w-4 h-4 text-gray-800" />
+                                  </button>
+                                </motion.div>
+                              ))}
+                              
+                              {/* Add more button */}
+                              {(formData.keptImages.length + formData.newFiles.length) < 6 && (
                                 <motion.div
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
@@ -660,7 +860,7 @@ const EditAdoption = () => {
                             {isUploading && (
                               <div className="text-center py-4">
                                 <div className="w-8 h-8 mx-auto border-t-2 border-emerald-500 border-solid rounded-full animate-spin"></div>
-                                <p className="mt-2 text-sm text-gray-500">Uploading images...</p>
+                                <p className="mt-2 text-sm text-gray-500">Processing images...</p>
                               </div>
                             )}
                           </div>
