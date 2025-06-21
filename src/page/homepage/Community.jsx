@@ -10,18 +10,24 @@ import HamsterLoader from "../../component/Loader";
 export default function Community() {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  // const [searchQuery, setSearchQuery] = useState("");
   const cardsPerPage = 6;
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
-        const { data } = await axios.get("http://localhost:5000/api/posts/get-posts", { headers });
+        const headers = user?.token
+          ? { Authorization: `Bearer ${user.token}` }
+          : {};
+        const { data } = await axios.get(
+          "http://localhost:5000/api/posts/get-posts",
+          { headers },
+        );
         setPosts(data);
         setError(null);
       } catch (err) {
@@ -45,21 +51,19 @@ export default function Community() {
   };
 
   if (loading) {
-    return (     
-      <HamsterLoader size={14} />
-    );
+    return <HamsterLoader size={14} />;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
         <div className="flex-grow flex justify-center items-center">
-          <div className="text-center">
-            <p className="text-red-500 text-lg">{error}</p>
+          <div className="text-center bg-white p-8 rounded-lg shadow-md max-w-md">
+            <p className="text-red-500 text-lg mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 bg-[#A0C878] text-white px-4 py-2 rounded-full"
+              className="mt-4 bg-[#A0C878] hover:bg-[#8cb368] text-white px-6 py-2 rounded-full transition-colors"
             >
               Try Again
             </button>
@@ -75,23 +79,34 @@ export default function Community() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative w-full h-[500px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-400 opacity-90 z-10"></div>
+      <section className="relative w-full h-[500px] bg-[#A0C878] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#A0C878] to-[#FAF6E9] opacity-60 z-10"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-20">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Pet Lovers Community
           </h1>
           <h2 className="text-2xl md:text-3xl font-semibold text-white mb-6">
             Share, Connect & Learn Together
           </h2>
           <p className="text-lg text-white max-w-2xl mb-8">
-            Join thousands of pet enthusiasts sharing stories, advice, and photos.
+            Join thousands of pet enthusiasts sharing stories, advice, and
+            photos of their furry friends.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-white text-emerald-600 hover:bg-emerald-50 px-8 py-3 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-xl">
+            <button
+              onClick={() => navigate("/createpost")}
+              className="bg-white text-black hover:bg-emerald-50 px-8 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+            >
               Share Your Story
             </button>
-            <button className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-8 py-3 rounded-full text-lg font-semibold transition">
+            <button
+              onClick={() =>
+                document
+                  .getElementById("posts-section")
+                  .scrollIntoView({ behavior: "smooth" })
+              }
+              className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-8 py-3 rounded-full text-lg font-semibold transition hover:scale-105"
+            >
               Explore Posts
             </button>
           </div>
@@ -99,34 +114,63 @@ export default function Community() {
       </section>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10">
+      <main
+        id="posts-section"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow scroll-mt-16"
+      >
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-800">Community Posts</h2>
-            <p className="text-gray-600 mt-2">Discover stories and tips from fellow pet lovers</p>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Community Posts
+            </h2>
+            <p className="text-gray-600 mt-2">
+              Discover stories and tips from fellow pet lovers
+            </p>
           </div>
 
-          <div className="mt-4 md:mt-0 flex gap-3">
-            <div className="relative">
-              <select className="appearance-none bg-white border border-gray-300 rounded-full pl-5 pr-10 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                <option>All Topics</option>
-                <option>Training Tips</option>
-                <option>Health & Nutrition</option>
-                <option>Adoption Stories</option>
-                <option>Pet Care</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg className="fill-current h-4 w-4" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            {/* <div className="relative flex-grow max-w-md"> */}
+            {/*   <input */}
+            {/*     type="text" */}
+            {/*     placeholder="Search posts..." */}
+            {/*     value={searchQuery} */}
+            {/*     onChange={(e) => { */}
+            {/*       setSearchQuery(e.target.value); */}
+            {/*       setCurrentPage(1); */}
+            {/*     }} */}
+            {/*     className="w-full bg-white border border-gray-300 rounded-full pl-5 pr-10 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" */}
+            {/*   /> */}
+            {/*   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"> */}
+            {/*     <svg */}
+            {/*       className="h-5 w-5" */}
+            {/*       fill="none" */}
+            {/*       stroke="currentColor" */}
+            {/*       viewBox="0 0 24 24" */}
+            {/*     > */}
+            {/*       <path */}
+            {/*         strokeLinecap="round" */}
+            {/*         strokeLinejoin="round" */}
+            {/*         strokeWidth={2} */}
+            {/*         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" */}
+            {/*       /> */}
+            {/*     </svg> */}
+            {/*   </div> */}
+            {/* </div> */}
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-medium transition flex items-center"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-full font-medium transition-all flex items-center justify-center whitespace-nowrap hover:scale-105"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-1"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               New Post
             </button>
@@ -134,74 +178,216 @@ export default function Community() {
         </div>
 
         {/* Post Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
-          {currentPosts.map(post => (
-            <PostCard key={post._id} post={post} />
-          ))}
-        </div>
+        {currentPosts.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {currentPosts.map((post) => (
+                <PostCard key={post._id} post={post} />
+              ))}
+            </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-16">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                currentPage === 1
-                  ? "text-gray-400 cursor-not-allowed"
-                  : "text-gray-700 hover:bg-emerald-100 hover:text-emerald-700"
-              }`}
-            >
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </button>
+            {/* Pagination */}
+            <div className="flex justify-center mt-16">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`p-2 rounded-full text-sm font-medium ${
+                    currentPage === 1
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-emerald-100 hover:text-emerald-700"
+                  }`}
+                >
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
 
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => handlePageChange(i + 1)}
-                className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  currentPage === i + 1
-                    ? "bg-emerald-500 text-white shadow-md"
-                    : "text-gray-700 hover:bg-emerald-100"
-                }`}
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`w-10 h-10 rounded-full text-sm font-medium flex items-center justify-center ${
+                      currentPage === i + 1
+                        ? "bg-emerald-600 text-white shadow-md"
+                        : "text-gray-700 hover:bg-emerald-100"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() =>
+                    handlePageChange(Math.min(currentPage + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className={`p-2 rounded-full text-sm font-medium ${
+                    currentPage === totalPages
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-emerald-100 hover:text-emerald-700"
+                  }`}
+                >
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <div className="mx-auto max-w-md">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {i + 1}
-              </button>
-            ))}
-
-            <button
-              onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                currentPage === totalPages
-                  ? "text-gray-400 cursor-not-allowed"
-                  : "text-gray-700 hover:bg-emerald-100 hover:text-emerald-700"
-              }`}
-            >
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
-            </button>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">
+                No posts found
+              </h3>
+              <p className="mt-1 text-gray-500">
+                {searchQuery
+                  ? "Try a different search term"
+                  : "Be the first to create a post!"}
+              </p>
+              <div className="mt-6">
+                <button
+                  onClick={() => navigate("/createpost")}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                >
+                  <svg
+                    className="-ml-1 mr-2 h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  New Post
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* CTA Section */}
-      <section className="bg-emerald-50 py-16 mt-12">
+      <section className="bg-emerald-600 py-16 mt-12">
         <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Ready to share your pet story?</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join our growing community of pet lovers and share your experiences, photos, and advice with thousands of fellow enthusiasts.
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Become an active community member
+          </h2>
+          <p className="text-emerald-100 mb-8 max-w-2xl mx-auto">
+            Engage with other pet lovers and make the most of our community
+            features
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-semibold transition shadow-md hover:shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
+              <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="h-6 w-6 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-white font-semibold mb-2">Ask Questions</h3>
+              <p className="text-emerald-100 text-sm">
+                Get advice from experienced pet owners
+              </p>
+            </div>
+            <div className="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
+              <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="h-6 w-6 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-white font-semibold mb-2">Share Photos</h3>
+              <p className="text-emerald-100 text-sm">
+                Show off your adorable pets
+              </p>
+            </div>
+            <div className="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
+              <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="h-6 w-6 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-white font-semibold mb-2">Connect</h3>
+              <p className="text-emerald-100 text-sm">
+                Meet other pet lovers in your area
+              </p>
+            </div>
+          </div>
+          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              onClick={() => navigate("/createpost")}
+              className="bg-white text-emerald-600 hover:bg-emerald-50 px-8 py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105"
+            >
               Create Your First Post
             </button>
-            <button className="bg-white text-emerald-600 border border-emerald-500 hover:bg-emerald-50 px-8 py-3 rounded-full font-semibold transition">
-              Browse Community Guidelines
-            </button>
+            {/* <button */}
+            {/*   onClick={() => navigate("/community/guidelines")} */}
+            {/*   className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-8 py-3 rounded-full font-semibold transition hover:scale-105" */}
+            {/* > */}
+            {/*   Community Guidelines */}
+            {/* </button> */}
           </div>
         </div>
       </section>

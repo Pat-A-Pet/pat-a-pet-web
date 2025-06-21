@@ -5,7 +5,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [name, setName] = useState(""); 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,7 +14,7 @@ export default function SignUp() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError(""); 
+    setError("");
 
     if (!name || !email || !password || !confirmPassword) {
       setError("All fields are required");
@@ -27,13 +27,16 @@ export default function SignUp() {
     }
 
     const payload = {
-      fullname : name,
+      fullname: name,
       email,
       password,
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", payload);
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        payload,
+      );
       const { token, user } = response.data;
 
       localStorage.setItem("token", token);
@@ -42,7 +45,9 @@ export default function SignUp() {
       navigate("/home");
     } catch (err) {
       console.error(err.response?.data?.error || err.message);
-      setError(err.response?.data?.error || "Something went wrong during registration");
+      setError(
+        err.response?.data?.error || "Something went wrong during registration",
+      );
     }
   };
 
@@ -56,19 +61,26 @@ export default function SignUp() {
           className="absolute bottom-0 left-0 w-full h-[250px] object-contain"
         />
         <div className="relative z-10 max-w-md text-left">
-          <h1 style={{ fontFamily: "'Epilogue', sans-serif" }} className="text-white font-bold text-[50px] leading-[1.1]">
+          <h1
+            style={{ fontFamily: "'Epilogue', sans-serif" }}
+            className="text-white font-bold text-[50px] leading-[1.1]"
+          >
             Welcome to <br /> Pat-A-Pet
           </h1>
           <hr className="border-white w-20 my-4" />
           {/* <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p> */}
-          <p className="text-lg">Connecting pets with loving homes, faster and simpler than ever.</p>
+          <p className="text-lg">
+            Connecting pets with loving homes, faster and simpler than ever.
+          </p>
         </div>
       </div>
 
       {/* Right Section */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-[#FDF7F4] p-10 rounded-tl-[50px] rounded-bl-[50px] shadow-lg">
         <img src="logo.png" alt="logo" className="w-40 mb-3" />
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Create Account</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+          Create Account
+        </h2>
 
         <form className="w-3/4" onSubmit={handleSignUp}>
           <label className="block text-gray-700 mb-2">Full Name</label>
@@ -134,7 +146,7 @@ export default function SignUp() {
             className="font-bold hover:underline"
             style={{ color: "#A0C878" }}
           >
-            Login
+            Sign in
           </button>
         </p>
       </div>

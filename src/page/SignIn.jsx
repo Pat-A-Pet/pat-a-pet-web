@@ -14,24 +14,28 @@ export default function SignIn() {
   const { fetchUser } = useContext(UserContext);
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await axios.post("http://localhost:5000/api/auth/signin", {
-      email,
-      password,
-    });
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signin",
+        {
+          email,
+          password,
+        },
+      );
 
-    const { token } = response.data;
+      const { token } = response.data;
 
-    localStorage.setItem("token", token);
-    await fetchUser(); // ✅ fetch user data into context
+      localStorage.setItem("token", token);
+      await fetchUser(); // ✅ fetch user data into context
 
-    navigate("/home");
-  } catch (err) {
-    console.error(err.response?.data?.error || err.message);
-    setError(err.response?.data?.error || "Something went wrong");
-  }
-};
+      navigate("/");
+      window.location.reload(); // Then reload the page
+    } catch (err) {
+      console.error(err.response?.data?.error || err.message);
+      setError(err.response?.data?.error || "Something went wrong");
+    }
+  };
 
   return (
     <div className="flex h-screen w-full bg-[#A0C878]">
@@ -63,19 +67,23 @@ export default function SignIn() {
           className="absolute bottom-0 left-0 w-full h-[250px] object-contain"
         />
         <div className="relative z-10 max-w-md text-left">
-          <h1 style={{ fontFamily: "'Epilogue', sans-serif" }} className="text-white font-bold text-[50px] leading-[1.1]">
+          <h1
+            style={{ fontFamily: "'Epilogue', sans-serif" }}
+            className="text-white font-bold text-[50px] leading-[1.1]"
+          >
             Welcome back <br /> Pawrents
           </h1>
           <hr className="border-white w-20 my-4" />
           {/* <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p> */}
-          <p className="text-lg">Connecting pets with loving homes, faster and simpler than ever.</p>
+          <p className="text-lg">
+            Connecting pets with loving homes, faster and simpler than ever.
+          </p>
         </div>
       </div>
 
-
       {/* Right Section */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-[#FDF7F4] p-10 rounded-tl-[50px] rounded-bl-[50px] shadow-lg">
-       <img
+        <img
           src="logo.png"
           alt="pat-a-pet"
           className="absolute top-15 mid w-40 z-20"
@@ -132,18 +140,18 @@ export default function SignIn() {
             className="w-full text-white py-2 rounded-lg font-semibold hover:bg-[#0f6b87] transition"
             style={{ backgroundColor: "#A0C878" }}
           >
-            Login
+            Sign in
           </button>
         </form>
 
         <p className="mt-6 text-gray-600 text-sm">
-          Belum Memiliki Akun?{" "}
+          Don't have an account yet?{" "}
           <button
             onClick={() => navigate("/signup")}
             className="font-bold hover:underline"
             style={{ color: "#A0C878" }}
           >
-            Membuat Akun
+            Create account
           </button>
         </p>
       </div>

@@ -12,27 +12,95 @@ import ChatPage from "./page/homepage/Chat";
 import LandingPage from "./page/LandingPage";
 import EditAdoption from "./page/homepage/EditAdoption";
 import { UserProvider } from "./context/UserContext";
+import { AuthProvider, ProtectedRoute } from "./handler/AuthHandler"; // Import the AuthProvider and ProtectedRoute
 
 function App() {
   return (
     <Router>
-      <UserProvider>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/listing" element={<Listing />} />
-          <Route path="/petdetail/:id" element={<PetDetail />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/myhub" element={<MyHub />} />
-          <Route path="/createadopt" element={<CreateAdoption />} />
-          <Route path="/editadopt/:id" element={<EditAdoption />} />
-          <Route path="/createpost" element={<PostCreationPage />} />
-          <Route path="/chat/" element={<ChatPage/>}/>
-          <Route path="/chat/:channelId" element={<ChatPage/>}/>
-        </Routes>
-      </UserProvider>
+      <AuthProvider>
+        {" "}
+        {/* Wrap with AuthProvider */}
+        <UserProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+
+            <Route
+              path="/listing"
+              element={
+                <ProtectedRoute>
+                  <Listing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/petdetail/:id"
+              element={
+                <ProtectedRoute>
+                  <PetDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <ProtectedRoute>
+                  <Community />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/myhub"
+              element={
+                <ProtectedRoute>
+                  <MyHub />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/createadopt"
+              element={
+                <ProtectedRoute>
+                  <CreateAdoption />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/editadopt/:id"
+              element={
+                <ProtectedRoute>
+                  <EditAdoption />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/createpost"
+              element={
+                <ProtectedRoute>
+                  <PostCreationPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat/"
+              element={
+                <ProtectedRoute>
+                  <ChatPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat/:channelId"
+              element={
+                <ProtectedRoute>
+                  <ChatPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </UserProvider>
+      </AuthProvider>
     </Router>
   );
 }
