@@ -233,7 +233,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-96 justify-items-center items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-6 justify-items-center items-start">
           {posts.length > 0 ? (
             posts.map((post) => <PostCard key={post._id} post={post} />)
           ) : (

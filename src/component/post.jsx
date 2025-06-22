@@ -124,7 +124,7 @@ export default function PostCard({ post }) {
   };
 
   return (
-    <div className="w-[400px] p-[2px] bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 rounded-[24px] shadow-[0_8px_30px_rgba(34,197,94,0.12)] hover:shadow-[0_12px_40px_rgba(34,197,94,0.20)] transition-all duration-300">
+    <div className="w-full p-[2px] bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 rounded-[24px] shadow-[0_8px_30px_rgba(34,197,94,0.12)] hover:shadow-[0_12px_40px_rgba(34,197,94,0.20)] transition-all duration-300">
       <div className="bg-white rounded-[22px] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
@@ -329,4 +329,3 @@ export default function PostCard({ post }) {
     </div>
   );
 }
-

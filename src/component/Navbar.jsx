@@ -80,7 +80,7 @@ const Navbar = () => {
       >
         {/* Logo - Made responsive with smaller size on mobile */}
         <div className="flex-1">
-          <Link to={"/"} className="text-2xl font-bold text-gray-800">
+          <Link to={"/"} className="max-w-min text-2xl font-bold text-gray-800">
             <motion.img
               src="/logo-removebg.png"
               alt="pat-a-pet"
@@ -204,7 +204,7 @@ const Navbar = () => {
           whileTap={{ scale: 0.9 }}
         >
           {menuOpen ? (
-            <X size={24} className="text-[#A0C878]" /> // Smaller icon on mobile
+            <X size={24} className="text-black" /> // Smaller icon on mobile
           ) : (
             <Menu size={24} /> // Smaller icon on mobile
           )}

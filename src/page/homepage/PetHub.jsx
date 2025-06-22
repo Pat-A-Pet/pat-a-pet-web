@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Footer from "../../component/Footer";
 import Navbar from "../../component/Navbar";
 import Card from "../../component/card";
-import PostCard from "../../component/post";
+import PostCard from "../../component/post"; // Assuming PostCard is also responsive
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
@@ -22,6 +22,8 @@ import {
   FaFeatherAlt,
   FaHome,
   FaEdit,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 
 const MyHub = () => {
@@ -527,9 +529,10 @@ const MyHub = () => {
 
         {/* Enhanced Tabs Navigation */}
         <div className="sticky top-0 z-10 bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-max mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex relative border-b border-gray-200 overflow-hidden">
-              <div className="flex space-x-1">
+              {/* Added overflow-x-auto and scrolling-touch for mobile tab scrolling */}
+              <div className="flex space-x-1 overflow-x-hidden scrolling-touch pb-2">
                 {[
                   {
                     id: "favorites",
@@ -574,7 +577,9 @@ const MyHub = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="flex gap-4 items-center">
+                    <span className="flex gap-2 sm:gap-4 items-center">
+                      {" "}
+                      {/* Adjusted gap for smaller screens */}
                       {tab.icon}
                       {tab.label} ({tab.count})
                     </span>
@@ -611,16 +616,20 @@ const MyHub = () => {
               >
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-800">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                      {" "}
+                      {/* Adjusted text size for responsiveness */}
                       Pets I Want to Adopt
                     </h2>
-                    <p className="text-gray-600 mt-2">
+                    <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                      {" "}
+                      {/* Adjusted text size */}
                       Your saved pets for potential adoption
                     </p>
                   </div>
                   <motion.button
                     onClick={() => navigate("/listing")}
-                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
+                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-xl font-medium shadow-md transition-all text-sm sm:text-base"
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -630,7 +639,9 @@ const MyHub = () => {
                 </div>
 
                 {cardsData.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 place-items-center-safe">
+                    {" "}
+                    {/* Adjusted gap for smaller screens */}
                     {cardsData.map((item, index) => (
                       <motion.div
                         key={item._id || index}
@@ -647,27 +658,33 @@ const MyHub = () => {
                   </div>
                 ) : (
                   <motion.div
-                    className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100"
+                    className="text-center py-12 sm:py-16 bg-white rounded-2xl shadow-sm border border-gray-100 px-4"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 rounded-full mb-4 sm:mb-6">
+                      {" "}
+                      {/* Adjusted size for responsiveness */}
                       <FaHeart
                         icon="heart"
-                        className="text-emerald-500 text-3xl"
+                        className="text-emerald-500 text-2xl sm:text-3xl"
                       />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-3">
+                      {" "}
+                      {/* Adjusted size */}
                       No favorite pets yet
                     </h3>
-                    <p className="text-gray-500 max-w-md mx-auto mb-6">
-                      Start browsing pets to add to your favorites and find your
+                    <p className="text-gray-500 max-w-sm mx-auto mb-4 sm:mb-6 text-sm sm:text-base">
+                      {" "}
+                      {/* Adjusted max-width and text size */}
+                      Start Browse pets to add to your favorites and find your
                       perfect companion!
                     </p>
                     <motion.button
                       onClick={() => navigate("/listing")}
-                      className="inline-flex items-center px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl shadow-md transition-all"
+                      className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl shadow-md transition-all text-sm sm:text-base"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -689,173 +706,64 @@ const MyHub = () => {
                 exit="exit"
                 className="space-y-8"
               >
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-6">
                   <div>
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                       My Community Posts
                     </h2>
-                    <p className="text-gray-600 mt-2">
+                    <p className="text-gray-600 mt-2 text-sm sm:text-base">
                       Share your pet experiences with fellow pet lovers
                     </p>
                   </div>
                   <motion.button
                     onClick={() => navigate("/createpost")}
-                    className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center"
+                    className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center text-sm sm:text-base"
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative flex items-center">
-                      <FaPlus icon="plus" className="h-5 w-5 mr-2" />
+                      <FaPlus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       New Post
                     </div>
                   </motion.button>
                 </div>
 
                 {postsData.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                     {postsData.map((post, index) => (
-                      <motion.div
+                      <PostCard
                         key={post._id}
-                        variants={cardVariants}
-                        custom={index}
-                        initial="hidden"
-                        animate="visible"
-                        className="group bg-white rounded-2xl shadow-lg hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                      >
-                        {/* Post Images Carousel */}
-                        {post.imageUrls?.length > 0 && (
-                          <div className="relative h-64 overflow-hidden">
-                            <img
-                              src={post.imageUrls[0]}
-                              alt={post.title}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                            {post.imageUrls.length > 1 && (
-                              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                                {post.imageUrls.map((_, idx) => (
-                                  <button
-                                    key={idx}
-                                    className={`w-2.5 h-2.5 rounded-full transition-all ${
-                                      idx === 0 ? "bg-white" : "bg-white/50"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        <div className="p-6">
-                          <div className="flex items-center mb-4">
-                            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mr-4">
-                              {post.user?.profilePicture ? (
-                                <img
-                                  src={post.user.profilePicture}
-                                  alt="Profile"
-                                  className="w-full h-full rounded-full object-cover"
-                                />
-                              ) : (
-                                <FaUser
-                                  icon="user"
-                                  className="text-emerald-500 text-xl"
-                                />
-                              )}
-                            </div>
-                            <div>
-                              <h4 className="font-semibold text-gray-900">
-                                {post.user?.fullname || "Anonymous"}
-                              </h4>
-                              <p className="text-sm text-gray-500">
-                                {new Date(post.createdAt).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  },
-                                )}
-                              </p>
-                            </div>
-                          </div>
-
-                          <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">
-                            {post.title}
-                          </h3>
-                          <p className="text-gray-600 mb-4 line-clamp-3">
-                            {post.description}
-                          </p>
-
-                          {post.tags?.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-6">
-                              {post.tags.map((tag, i) => (
-                                <span
-                                  key={i}
-                                  className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
-                                >
-                                  #{tag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                            <div className="flex space-x-4">
-                              <div className="flex items-center text-gray-500">
-                                <FaHeart
-                                  icon="heart"
-                                  className="mr-2 text-red-400"
-                                />
-                                <span>{post.loves?.length || 0}</span>
-                              </div>
-                              <div className="flex items-center text-gray-500">
-                                <FaComment
-                                  icon="comment"
-                                  className="mr-2 text-blue-400"
-                                />
-                                <span>{post.comments?.length || 0}</span>
-                              </div>
-                            </div>
-                            <motion.button
-                              onClick={() => handleDeletePost(post._id)}
-                              className="text-red-500 hover:text-red-600 transition-colors"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <FaTrash icon="trash" />
-                            </motion.button>
-                          </div>
-                        </div>
-                      </motion.div>
+                        post={post}
+                        index={index}
+                        handleDeletePost={handleDeletePost}
+                      />
                     ))}
                   </div>
                 ) : (
                   <motion.div
-                    className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100"
+                    className="text-center py-12 sm:py-16 bg-white rounded-2xl shadow-sm border border-gray-100 px-4"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl border-2 border-dashed border-emerald-300 mb-6">
-                      <FaFeatherAlt
-                        icon="feather"
-                        className="text-emerald-500 text-3xl"
-                      />
+                    <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl border-2 border-dashed border-emerald-300 mb-4 sm:mb-6">
+                      <FaFeatherAlt className="text-emerald-500 text-2xl sm:text-3xl" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-3">
                       No posts yet
                     </h3>
-                    <p className="text-gray-500 max-w-md mx-auto mb-6">
+                    <p className="text-gray-500 max-w-sm mx-auto mb-4 sm:mb-6 text-sm sm:text-base">
                       Share your pet stories and connect with fellow pet lovers
                       in the community!
                     </p>
                     <motion.button
                       onClick={() => navigate("/createpost")}
-                      className="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="inline-flex items-center px-6 py-2.5 sm:px-8 sm:py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <FaPlus icon="plus" className="mr-2" />
+                      <FaPlus className="mr-2" />
                       Create Your First Post
                     </motion.button>
                   </motion.div>
@@ -873,19 +781,23 @@ const MyHub = () => {
                 exit="exit"
                 className="space-y-6"
               >
-                <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold text-gray-800">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  {" "}
+                  {/* Adjusted items alignment and added gap */}
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                    {" "}
+                    {/* Adjusted text size */}
                     Pets I'm Helping Find Homes
                   </h2>
                   <motion.button
                     onClick={() => navigate("/createadopt")}
-                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition"
+                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition text-sm sm:text-base"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-1"
+                      className="h-4 w-4 sm:h-5 sm:w-5 mr-1"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -908,16 +820,18 @@ const MyHub = () => {
                   </div>
                 ) : adoptionPosts.length === 0 ? (
                   <motion.div
-                    className="text-center py-12"
+                    className="text-center py-12 sm:py-16"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
-                    <h3 className="mt-4 text-xl font-medium text-gray-900">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4">
+                      {/* Placeholder for an icon, if desired */}
+                    </div>
+                    <h3 className="mt-4 text-xl sm:text-2xl font-medium text-gray-900">
                       No adoption posts yet
                     </h3>
-                    <p className="mt-1 text-gray-500">
+                    <p className="mt-1 text-gray-500 text-sm sm:text-base">
                       Help pets find their forever homes by creating adoption
                       posts
                     </p>
@@ -941,29 +855,41 @@ const MyHub = () => {
                         animate="visible"
                         className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100"
                       >
-                        <div className="p-5">
-                          <div className="flex">
-                            <div className="flex-shrink-0">
+                        <div className="p-4 sm:p-5">
+                          {" "}
+                          {/* Adjusted padding */}
+                          {/* Changed to flex-col for small screens, then sm:flex-row */}
+                          <div className="flex flex-col sm:flex-row">
+                            <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4">
+                              {" "}
+                              {/* Adjusted margin for mobile/desktop */}
                               {pet.imageUrls && pet.imageUrls.length > 0 ? (
                                 <img
                                   src={pet.imageUrls[0]}
                                   alt={pet.name}
-                                  className="w-24 h-24 rounded-xl object-cover"
+                                  className="w-full h-40 sm:w-24 sm:h-24 rounded-xl object-cover" // Made image responsive width on small screens
                                 />
                               ) : (
-                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-24 h-24" />
+                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-24 h-24 mx-auto sm:mx-0" />
                               )}
                             </div>
-                            <div className="ml-4 flex-1">
-                              <div className="flex justify-between items-start">
+                            <div className="ml-0 sm:ml-4 flex-1">
+                              {" "}
+                              {/* Adjusted margin */}
+                              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                                {" "}
+                                {/* Stacks on mobile, row on sm */}
                                 <div>
-                                  <h3 className="text-xl font-bold text-gray-800">
+                                  <h3 className="text-lg sm:text-xl font-bold text-gray-800">
                                     {pet.name}
                                   </h3>
-                                  <p className="text-gray-600">{pet.breed}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {pet.breed}
+                                  </p>
                                 </div>
                                 <motion.span
-                                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                  className={`px-3 py-1 rounded-full text-xs font-medium mt-2 sm:mt-0 ${
+                                    /* Adjusted margin for mobile */
                                     pet.status === "available"
                                       ? "bg-green-100 text-green-800"
                                       : "bg-yellow-100 text-yellow-800"
@@ -975,40 +901,26 @@ const MyHub = () => {
                                     : "Adopted"}
                                 </motion.span>
                               </div>
-
-                              <div className="mt-4 grid grid-cols-2 gap-4">
+                              <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                                {" "}
+                                {/* Adjusted text size for grid */}
                                 <div>
-                                  <p className="text-sm text-gray-500">Age</p>
+                                  <p className="text-gray-500">Age</p>
                                   <p className="font-medium">{pet.age} years</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">
-                                    Gender
-                                  </p>
+                                  <p className="text-gray-500">Gender</p>
                                   <p className="font-medium">{pet.gender}</p>
                                 </div>
-                                {/* <div> */}
-                                {/*   <p className="text-sm text-gray-500">Views</p> */}
-                                {/*   <p className="font-medium"> */}
-                                {/*     {pet.views || 0} */}
-                                {/*   </p> */}
-                                {/* </div> */}
-                                {/* <div> */}
-                                {/*   <p className="text-sm text-gray-500"> */}
-                                {/*     Inquiries */}
-                                {/*   </p> */}
-                                {/*   <p className="font-medium"> */}
-                                {/*     {pet.inquiries || 0} */}
-                                {/*   </p> */}
-                                {/* </div> */}
                               </div>
-
-                              <div className="mt-4 flex space-x-3">
+                              <div className="mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                                {" "}
+                                {/* Stack buttons on mobile, row on sm */}
                                 <motion.button
                                   onClick={() =>
                                     navigate(`/editadopt/${pet._id}`)
                                   }
-                                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-medium transition"
+                                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-medium transition text-sm"
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                 >
@@ -1016,7 +928,7 @@ const MyHub = () => {
                                 </motion.button>
                                 <motion.button
                                   onClick={() => handleDeleteAdoption(pet._id)}
-                                  className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-red-100 text-red-500 rounded-lg transition"
+                                  className="w-full sm:w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-red-100 text-red-500 rounded-lg transition"
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                 >
@@ -1056,7 +968,7 @@ const MyHub = () => {
                 exit="exit"
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                   My Adoption Requests
                 </h2>
 
@@ -1069,17 +981,17 @@ const MyHub = () => {
                   </div>
                 ) : buyerRequests.requested.length === 0 ? (
                   <motion.div
-                    className="text-center py-12"
+                    className="text-center py-12 sm:py-16"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
-                    <h3 className="mt-4 text-xl font-medium text-gray-900">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4" />
+                    <h3 className="mt-4 text-xl sm:text-2xl font-medium text-gray-900">
                       No adoption requests yet
                     </h3>
-                    <p className="mt-1 text-gray-500">
-                      Start browsing pets to find your new companion!
+                    <p className="mt-1 text-gray-500 text-sm sm:text-base">
+                      Start Browse pets to find your new companion!
                     </p>
                     <motion.button
                       onClick={() => navigate("/listing")}
@@ -1101,29 +1013,32 @@ const MyHub = () => {
                         animate="visible"
                         className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100"
                       >
-                        <div className="p-5">
+                        <div className="p-4 sm:p-5">
+                          {/* Ensured image and details stack on mobile and go side-by-side on sm */}
                           <div className="flex flex-col sm:flex-row sm:items-start">
                             <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
                               {pet.imageUrls && pet.imageUrls.length > 0 ? (
                                 <img
                                   src={pet.imageUrls[0]}
                                   alt={pet.name}
-                                  className="w-32 h-32 rounded-xl object-cover"
+                                  className="w-full h-48 rounded-xl object-cover sm:w-32 sm:h-32" // Responsive image width
                                 />
                               ) : (
-                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-32 h-32" />
+                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-32 h-32 mx-auto sm:mx-0" /> // Centered placeholder
                               )}
                             </div>
                             <div className="flex-1">
                               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                                 <div>
-                                  <h3 className="text-xl font-bold text-gray-800">
+                                  <h3 className="text-lg sm:text-xl font-bold text-gray-800">
                                     {pet.name}
                                   </h3>
-                                  <p className="text-gray-600">{pet.breed}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {pet.breed}
+                                  </p>
                                 </div>
                                 <motion.span
-                                  className={`px-3 py-1 rounded-full text-sm font-medium mt-2 sm:mt-0 ${
+                                  className={`px-3 py-1 rounded-full text-xs font-medium mt-2 sm:mt-0 ${
                                     pet.userRequest?.status === "pending"
                                       ? "bg-yellow-100 text-yellow-800"
                                       : pet.userRequest?.status === "accepted"
@@ -1136,25 +1051,25 @@ const MyHub = () => {
                                 </motion.span>
                               </div>
 
-                              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                              <div className="mt-4 grid grid-cols-2 text-sm sm:grid-cols-4 gap-4">
+                                {" "}
+                                {/* Ensured grid columns adapt */}
                                 <div>
-                                  <p className="text-sm text-gray-500">Age</p>
+                                  <p className="text-gray-500">Age</p>
                                   <p className="font-medium">{pet.age}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">
-                                    Gender
-                                  </p>
+                                  <p className="text-gray-500">Gender</p>
                                   <p className="font-medium">{pet.gender}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">Owner</p>
+                                  <p className="text-gray-500">Owner</p>
                                   <p className="font-medium">
                                     {pet.owner?.fullname || "Unknown"}
                                   </p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">
+                                  <p className="text-gray-500">
                                     Date Requested
                                   </p>
                                   <p className="font-medium">
@@ -1165,18 +1080,11 @@ const MyHub = () => {
                                 </div>
                               </div>
 
-                              {/* <div className="mt-4">
-                                <p className="text-sm text-gray-500">Your Message</p>
-                                <p className="font-medium bg-gray-50 p-3 rounded-lg mt-1">
-                                  {pet.userRequest?.message || 'No message provided'}
-                                </p>
-                              </div> */}
-
                               <div className="mt-6 flex justify-end">
                                 {pet.userRequest?.status === "pending" && (
                                   <motion.button
                                     onClick={() => handleCancelRequest(pet._id)}
-                                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition"
+                                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition text-sm"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                   >
@@ -1204,10 +1112,10 @@ const MyHub = () => {
                 exit="exit"
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                   Adoption Requests for My Pets
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 mb-6 text-sm sm:text-base">
                   Review and manage adoption requests for your pets
                 </p>
 
@@ -1220,16 +1128,16 @@ const MyHub = () => {
                   </div>
                 ) : ownerRequests.length === 0 ? (
                   <motion.div
-                    className="text-center py-12"
+                    className="text-center py-12 sm:py-16"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
-                    <h3 className="mt-4 text-xl font-medium text-gray-900">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4" />
+                    <h3 className="mt-4 text-xl sm:text-2xl font-medium text-gray-900">
                       No adoption requests yet
                     </h3>
-                    <p className="mt-1 text-gray-500">
+                    <p className="mt-1 text-gray-500 text-sm sm:text-base">
                       You'll see adoption requests here when people apply to
                       adopt your pets
                     </p>
@@ -1245,32 +1153,33 @@ const MyHub = () => {
                         animate="visible"
                         className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100"
                       >
-                        <div className="p-6">
-                          <div className="flex flex-col md:flex-row gap-6">
-                            <div className="flex-shrink-0">
+                        <div className="p-4 sm:p-6">
+                          {/* Ensured image and details stack on mobile and go side-by-side on md */}
+                          <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+                            <div className="flex-shrink-0 mb-4 md:mb-0">
                               {pet.imageUrls && pet.imageUrls.length > 0 ? (
                                 <img
                                   src={pet.imageUrls[0]}
                                   alt={pet.name}
-                                  className="w-32 h-32 rounded-xl object-cover"
+                                  className="w-full h-48 rounded-xl object-cover md:w-32 md:h-32" // Responsive image width
                                 />
                               ) : (
-                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-32 h-32" />
+                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-32 h-32 mx-auto md:mx-0" />
                               )}
                             </div>
 
                             <div className="flex-1">
-                              <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
+                              <div className="flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-2 sm:gap-4 mb-4">
                                 <div>
-                                  <h3 className="text-xl font-bold text-gray-800">
+                                  <h3 className="text-lg sm:text-xl font-bold text-gray-800">
                                     {pet.name}
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm text-gray-600">
                                     {pet.breed} • {pet.age} years
                                   </p>
                                 </div>
                                 <motion.span
-                                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                  className={`px-3 py-1 rounded-full text-xs font-medium ${
                                     pet.status === "Available"
                                       ? "bg-green-100 text-green-800"
                                       : pet.status === "Adopted"
@@ -1285,28 +1194,40 @@ const MyHub = () => {
                                 </motion.span>
                               </div>
 
-                              <div className="mt-6">
-                                <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                              <div className="mt-4 sm:mt-6">
+                                {" "}
+                                {/* Adjusted margin */}
+                                <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
+                                  {" "}
+                                  {/* Adjusted text size and margin */}
                                   Adoption Requests (
                                   {pet.adoptionRequests.length})
                                 </h4>
-
                                 <div className="space-y-4">
                                   {pet.adoptionRequests.map(
                                     (request, reqIndex) => (
                                       <div
                                         key={reqIndex}
-                                        className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                                        className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                                       >
-                                        <div className="flex items-center mb-3">
+                                        <div className="flex items-center mb-2 sm:mb-3">
+                                          {" "}
+                                          {/* Adjusted margin */}
                                           <div className="flex-shrink-0">
-                                            <div className="bg-gray-200 border-2 border-dashed rounded-full w-12 h-12" />
+                                            <div className="bg-gray-200 border-2 border-dashed rounded-full w-10 h-10 sm:w-12 sm:h-12" />{" "}
+                                            {/* Adjusted size */}
                                           </div>
-                                          <div className="ml-3">
-                                            <h5 className="font-medium text-gray-900">
+                                          <div className="ml-2 sm:ml-3">
+                                            {" "}
+                                            {/* Adjusted margin */}
+                                            <h5 className="font-medium text-gray-900 text-sm sm:text-base">
+                                              {" "}
+                                              {/* Adjusted text size */}
                                               {request.user.fullname}
                                             </h5>
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-xs sm:text-sm text-gray-500">
+                                              {" "}
+                                              {/* Adjusted text size */}
                                               Applied on{" "}
                                               {new Date(
                                                 request.createdAt,
@@ -1315,16 +1236,12 @@ const MyHub = () => {
                                           </div>
                                         </div>
 
-                                        {/* <div className="mb-4">
-                                        <p className="text-sm text-gray-500">Message:</p>
-                                        <p className="font-medium bg-white p-3 rounded-lg mt-1 border border-gray-200">
-                                          {request.message || "No message provided"}
-                                        </p>
-                                      </div> */}
-
-                                        <div className="flex items-center justify-between">
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-0">
+                                          {" "}
+                                          {/* Stack on mobile, row on sm */}
                                           <motion.span
-                                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                            className={`px-2 py-0.5 rounded-full text-xs font-medium mb-2 sm:mb-0 ${
+                                              /* Adjusted padding and margin */
                                               request.status === "pending"
                                                 ? "bg-yellow-100 text-yellow-800"
                                                 : request.status === "accepted"
@@ -1339,7 +1256,6 @@ const MyHub = () => {
                                                 ? "Rejected"
                                                 : "Accepted"}
                                           </motion.span>
-
                                           {request.status === "pending" && (
                                             <div className="flex space-x-2">
                                               <motion.button
@@ -1350,7 +1266,7 @@ const MyHub = () => {
                                                     "approve",
                                                   )
                                                 }
-                                                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium text-sm"
+                                                className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium text-xs sm:text-sm"
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
                                               >
@@ -1364,7 +1280,7 @@ const MyHub = () => {
                                                     "reject",
                                                   )
                                                 }
-                                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-sm"
+                                                className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-xs sm:text-sm"
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
                                               >
@@ -1391,12 +1307,18 @@ const MyHub = () => {
         </main>
 
         {/* Enhanced Stats Section */}
-        <section className="bg-gradient-to-b from-emerald-50 to-white py-16 mt-12">
+        <section className="bg-gradient-to-b from-emerald-50 to-white py-12 sm:py-16 mt-8 sm:mt-12">
+          {" "}
+          {/* Adjusted padding and margin */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-8 sm:mb-12">
+              {" "}
+              {/* Adjusted text size and margin */}
               My Pet Journey
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mx-auto max-w-lg sm:max-w-none">
+              {" "}
+              {/* Adjusted gap and max-width for smaller screens */}
               {[
                 {
                   value: cardsData.length,
@@ -1411,20 +1333,27 @@ const MyHub = () => {
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
-                  className="bg-white rounded-2xl p-8 text-center shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100"
+                  className="bg-white rounded-2xl p-6 sm:p-8 text-center shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100"
                   variants={statVariants}
                   custom={index}
                   initial="hidden"
                   animate="visible"
                   whileHover={{ y: -5 }}
                 >
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4 mx-auto">
+                  <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-emerald-100 rounded-full mb-3 sm:mb-4 mx-auto text-xl sm:text-2xl">
+                    {" "}
+                    {/* Adjusted size and icon size */}
                     {stat.icon}
                   </div>
-                  <div className="text-4xl font-bold text-emerald-600 mb-2">
+                  <div className="text-3xl sm:text-4xl font-bold text-emerald-600 mb-1 sm:mb-2">
+                    {" "}
+                    {/* Adjusted text size and margin */}
                     {stat.value}
                   </div>
-                  <p className="text-lg text-gray-600">{stat.label}</p>
+                  <p className="text-base sm:text-lg text-gray-600">
+                    {stat.label}
+                  </p>{" "}
+                  {/* Adjusted text size */}
                 </motion.div>
               ))}
             </div>

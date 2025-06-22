@@ -79,23 +79,23 @@ export default function Community() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative w-full h-[500px] bg-[#A0C878] overflow-hidden">
+      <section className="relative w-full h-[400px] sm:h-[500px] bg-[#A0C878] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#A0C878] to-[#FAF6E9] opacity-60 z-10"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-20">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4">
             Pet Lovers Community
           </h1>
-          <h2 className="text-2xl md:text-3xl font-semibold text-white mb-6">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white mb-4 sm:mb-6">
             Share, Connect & Learn Together
           </h2>
-          <p className="text-lg text-white max-w-2xl mb-8">
+          <p className="text-base sm:text-lg text-white max-w-2xl mb-6 sm:mb-8 px-2 sm:px-0">
             Join thousands of pet enthusiasts sharing stories, advice, and
             photos of their furry friends.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-white text-black hover:bg-emerald-50 px-8 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="bg-white text-black hover:bg-emerald-50 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 w-full sm:w-auto"
             >
               Share Your Story
             </button>
@@ -105,7 +105,7 @@ export default function Community() {
                   .getElementById("posts-section")
                   .scrollIntoView({ behavior: "smooth" })
               }
-              className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-8 py-3 rounded-full text-lg font-semibold transition hover:scale-105"
+              className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition hover:scale-105 w-full sm:w-auto"
             >
               Explore Posts
             </button>
@@ -116,49 +116,22 @@ export default function Community() {
       {/* Main Content */}
       <main
         id="posts-section"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow scroll-mt-16"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow scroll-mt-16"
       >
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sm:mb-10 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-800">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
               Community Posts
             </h2>
-            <p className="text-gray-600 mt-2">
+            <p className="text-gray-600 mt-1 sm:mt-2">
               Discover stories and tips from fellow pet lovers
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            {/* <div className="relative flex-grow max-w-md"> */}
-            {/*   <input */}
-            {/*     type="text" */}
-            {/*     placeholder="Search posts..." */}
-            {/*     value={searchQuery} */}
-            {/*     onChange={(e) => { */}
-            {/*       setSearchQuery(e.target.value); */}
-            {/*       setCurrentPage(1); */}
-            {/*     }} */}
-            {/*     className="w-full bg-white border border-gray-300 rounded-full pl-5 pr-10 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" */}
-            {/*   /> */}
-            {/*   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"> */}
-            {/*     <svg */}
-            {/*       className="h-5 w-5" */}
-            {/*       fill="none" */}
-            {/*       stroke="currentColor" */}
-            {/*       viewBox="0 0 24 24" */}
-            {/*     > */}
-            {/*       <path */}
-            {/*         strokeLinecap="round" */}
-            {/*         strokeLinejoin="round" */}
-            {/*         strokeWidth={2} */}
-            {/*         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" */}
-            {/*       /> */}
-            {/*     </svg> */}
-            {/*   </div> */}
-            {/* </div> */}
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-full font-medium transition-all flex items-center justify-center whitespace-nowrap hover:scale-105"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 rounded-full font-medium transition-all flex items-center justify-center whitespace-nowrap hover:scale-105 w-full sm:w-auto"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -180,14 +153,14 @@ export default function Community() {
         {/* Post Cards */}
         {currentPosts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-start place-items-center-safe">
               {currentPosts.map((post) => (
                 <PostCard key={post._id} post={post} />
               ))}
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center mt-16">
+            <div className="flex justify-center mt-12 sm:mt-16">
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
@@ -215,7 +188,7 @@ export default function Community() {
                   <button
                     key={i + 1}
                     onClick={() => handlePageChange(i + 1)}
-                    className={`w-10 h-10 rounded-full text-sm font-medium flex items-center justify-center ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-sm font-medium flex items-center justify-center ${
                       currentPage === i + 1
                         ? "bg-emerald-600 text-white shadow-md"
                         : "text-gray-700 hover:bg-emerald-100"
@@ -252,7 +225,7 @@ export default function Community() {
             </div>
           </>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-12 sm:py-16">
             <div className="mx-auto max-w-md">
               <svg
                 className="mx-auto h-12 w-12 text-gray-400"
@@ -301,20 +274,20 @@ export default function Community() {
       </main>
 
       {/* CTA Section */}
-      <section className="bg-emerald-600 py-16 mt-12">
+      <section className="bg-emerald-600 py-12 sm:py-16 mt-8 sm:mt-12">
         <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
             Become an active community member
           </h2>
-          <p className="text-emerald-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-emerald-100 mb-6 sm:mb-8 max-w-2xl mx-auto">
             Engage with other pet lovers and make the most of our community
             features
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
-              <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
+            <div className="bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
+              <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="h-6 w-6 text-emerald-600"
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -327,15 +300,17 @@ export default function Community() {
                   />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">Ask Questions</h3>
-              <p className="text-emerald-100 text-sm">
+              <h3 className="text-white font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
+                Ask Questions
+              </h3>
+              <p className="text-emerald-100 text-xs sm:text-sm">
                 Get advice from experienced pet owners
               </p>
             </div>
-            <div className="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
-              <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
+              <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="h-6 w-6 text-emerald-600"
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -348,15 +323,17 @@ export default function Community() {
                   />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">Share Photos</h3>
-              <p className="text-emerald-100 text-sm">
+              <h3 className="text-white font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
+                Share Photos
+              </h3>
+              <p className="text-emerald-100 text-xs sm:text-sm">
                 Show off your adorable pets
               </p>
             </div>
-            <div className="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
-              <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
+              <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="h-6 w-6 text-emerald-600"
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -369,25 +346,21 @@ export default function Community() {
                   />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">Connect</h3>
-              <p className="text-emerald-100 text-sm">
+              <h3 className="text-white font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
+                Connect
+              </h3>
+              <p className="text-emerald-100 text-xs sm:text-sm">
                 Meet other pet lovers in your area
               </p>
             </div>
           </div>
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-white text-emerald-600 hover:bg-emerald-50 px-8 py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105"
+              className="bg-white text-emerald-600 hover:bg-emerald-50 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm sm:text-base"
             >
               Create Your First Post
             </button>
-            {/* <button */}
-            {/*   onClick={() => navigate("/community/guidelines")} */}
-            {/*   className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-8 py-3 rounded-full font-semibold transition hover:scale-105" */}
-            {/* > */}
-            {/*   Community Guidelines */}
-            {/* </button> */}
           </div>
         </div>
       </section>
