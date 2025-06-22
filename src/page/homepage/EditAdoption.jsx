@@ -1,7 +1,20 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiImage, FiTag, FiMapPin, FiDollarSign, FiInfo, FiHeart, FiCalendar, FiX, FiCheck, FiEdit, FiTrash2 } from "react-icons/fi";
+import {
+  FiArrowLeft,
+  FiImage,
+  FiTag,
+  FiMapPin,
+  FiDollarSign,
+  FiInfo,
+  FiHeart,
+  FiCalendar,
+  FiX,
+  FiCheck,
+  FiEdit,
+  FiTrash2,
+} from "react-icons/fi";
 import Navbar from "../../component/Navbar";
 import Footer from "../../component/Footer";
 import axios from "axios";
@@ -17,7 +30,7 @@ const EditAdoption = () => {
   const [originalData, setOriginalData] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-  
+
   const MAX_STEPS = 3;
   const progressPercentage = (step / MAX_STEPS) * 100;
 
@@ -38,9 +51,9 @@ const EditAdoption = () => {
     // medicalHistory: "",
     adoptionFee: "",
     location: "",
-    existingImages: [],   // Original image URLs from backend
-    keptImages: [],       // Existing images that are kept
-    newFiles: []          // New files to be uploaded
+    existingImages: [], // Original image URLs from backend
+    keptImages: [], // Existing images that are kept
+    newFiles: [], // New files to be uploaded
   });
 
   // Fetch existing pet data
@@ -48,21 +61,23 @@ const EditAdoption = () => {
     const fetchPetData = async () => {
       try {
         setIsUploading(true);
-        const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
-        
+        const headers = user?.token
+          ? { Authorization: `Bearer ${user.token}` }
+          : {};
+
         const response = await axios.get(
           `http://localhost:5000/api/pets/get-listing/${id}`,
-          { headers }
+          { headers },
         );
-        
+
         const petData = response.data.pet;
         setOriginalData({
           id: petData._id,
           createdAt: petData.createdAt,
           views: petData.views || 0,
-          inquiries: petData.inquiries || 0
+          inquiries: petData.inquiries || 0,
         });
-        
+
         setFormData({
           name: petData.name,
           breed: petData.breed,
@@ -82,9 +97,9 @@ const EditAdoption = () => {
           location: petData.location,
           existingImages: petData.imageUrls || [],
           keptImages: [...petData.imageUrls], // Start with all images kept
-          newFiles: []
+          newFiles: [],
         });
-        
+
         setError(null);
       } catch (err) {
         console.error("Error fetching pet data:", err);
@@ -99,9 +114,9 @@ const EditAdoption = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -124,34 +139,37 @@ const EditAdoption = () => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + formData.keptImages.length + formData.newFiles.length > 6) {
+    if (
+      files.length + formData.keptImages.length + formData.newFiles.length >
+      6
+    ) {
       setError("Maximum 6 images allowed");
       return;
     }
-    
+
     // Create preview URLs and store files
-    const newImages = files.map(file => ({
+    const newImages = files.map((file) => ({
       preview: URL.createObjectURL(file),
-      file
+      file,
     }));
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      newFiles: [...prev.newFiles, ...newImages].slice(0, 6)
+      newFiles: [...prev.newFiles, ...newImages].slice(0, 6),
     }));
   };
 
   const removeImage = (image, type) => {
-    if (type === 'existing') {
+    if (type === "existing") {
       // Remove from keptImages
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        keptImages: prev.keptImages.filter(img => img !== image)
+        keptImages: prev.keptImages.filter((img) => img !== image),
       }));
-    } else if (type === 'new') {
+    } else if (type === "new") {
       // Remove from newFiles and revoke object URL
-      setFormData(prev => {
-        const newFiles = prev.newFiles.filter(item => item.preview !== image);
+      setFormData((prev) => {
+        const newFiles = prev.newFiles.filter((item) => item.preview !== image);
         URL.revokeObjectURL(image);
         return { ...prev, newFiles };
       });
@@ -161,27 +179,27 @@ const EditAdoption = () => {
   const uploadNewImages = async () => {
     try {
       if (formData.newFiles.length === 0) return [];
-      
+
       const formDataForUpload = new FormData();
-      
+
       // Append all new files to form data
-      formData.newFiles.forEach(item => {
-        formDataForUpload.append('images', item.file);
+      formData.newFiles.forEach((item) => {
+        formDataForUpload.append("images", item.file);
       });
-      
+
       // Upload images with auth headers
       const response = await axios.post(
         "http://localhost:5000/api/pets/upload-pet-images",
         formDataForUpload,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${user.token}`
-          }
-        }
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${user.token}`,
+          },
+        },
       );
-      
-      return response.data.images.map(img => img.url);
+
+      return response.data.images.map((img) => img.url);
     } catch (err) {
       console.error("Image upload error:", err);
       throw new Error(err.response?.data?.error || "Failed to upload images");
@@ -191,8 +209,8 @@ const EditAdoption = () => {
   const updatePetListing = async (newImageUrls) => {
     try {
       // Clean adoption fee - remove non-numeric characters
-      const cleanAdoptionFee = formData.adoptionFee.replace(/[^0-9.]/g, '');
-      
+      const cleanAdoptionFee = formData.adoptionFee.replace(/[^0-9.]/g, "");
+
       // Prepare data for backend
       const payload = {
         name: formData.name,
@@ -210,18 +228,18 @@ const EditAdoption = () => {
         // medicalHistory: formData.medicalHistory,
         adoptionFee: parseFloat(cleanAdoptionFee) || 0,
         location: formData.location,
-        imageUrls: [...formData.keptImages, ...newImageUrls]
+        imageUrls: [...formData.keptImages, ...newImageUrls],
       };
-      
+
       // Update listing with authorization
       await axios.put(
         `http://localhost:5000/api/pets/update-listing/${id}`,
         payload,
         {
           headers: {
-            Authorization: `Bearer ${user.token}`
-          }
-        }
+            Authorization: `Bearer ${user.token}`,
+          },
+        },
       );
     } catch (err) {
       console.error("Listing update error:", err);
@@ -233,14 +251,14 @@ const EditAdoption = () => {
     e.preventDefault();
     setError(null);
     setIsUploading(true);
-    
+
     try {
       // 1. Upload new images to Cloudinary
       const newImageUrls = await uploadNewImages();
-      
+
       // 2. Update the pet listing
       await updatePetListing(newImageUrls);
-      
+
       // 3. Show success
       setIsSubmitted(true);
     } catch (err) {
@@ -252,32 +270,33 @@ const EditAdoption = () => {
   };
 
   const handleDeletePost = async () => {
-  if (!window.confirm("Are you sure you want to delete this adoption post?")) return;
-  
-  try {
-    setIsUploading(true);
-    await axios.delete(
-      `http://localhost:5000/api/pets/delete-listing/${id}`,  // Use the route param id
-      {
-        headers: {
-          Authorization: `Bearer ${user.token}`
-        }
-      }
-    );
-    
-    alert("Post deleted successfully!");
-    navigate('/home');  // Redirect after deletion
-  } catch (err) {
-    console.error("Listing delete error:", err);
-    setError(err.response?.data?.error || "Failed to delete listing");
-  } finally {
-    setIsUploading(false);
-  }
-};
+    if (!window.confirm("Are you sure you want to delete this adoption post?"))
+      return;
+
+    try {
+      setIsUploading(true);
+      await axios.delete(
+        `http://localhost:5000/api/pets/delete-listing/${id}`, // Use the route param id
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        },
+      );
+
+      alert("Post deleted successfully!");
+      navigate("/home"); // Redirect after deletion
+    } catch (err) {
+      console.error("Listing delete error:", err);
+      setError(err.response?.data?.error || "Failed to delete listing");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   // Format date for display
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -286,23 +305,34 @@ const EditAdoption = () => {
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
         <div className="text-center">
           <motion.div
-            animate={{ 
+            animate={{
               rotate: [0, 10, -10, 0],
-              scale: [1, 1.05, 1]
+              scale: [1, 1.05, 1],
             }}
-            transition={{ 
+            transition={{
               duration: 1.2,
               repeat: Infinity,
-              repeatType: "reverse"
+              repeatType: "reverse",
             }}
           >
             <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-emerald-400 to-green-500 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
           </motion.div>
-          <motion.h1 
+          <motion.h1
             className="mt-6 text-2xl font-bold text-gray-800"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -324,16 +354,18 @@ const EditAdoption = () => {
             <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
               <FiHeart className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">Error Loading Post</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-3">
+              Error Loading Post
+            </h2>
             <p className="text-gray-600 mb-6">{error}</p>
             <div className="flex justify-center gap-3">
-              <button 
+              <button
                 onClick={() => window.location.reload()}
                 className="px-6 py-3 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors"
               >
                 Try Again
               </button>
-              <button 
+              <button
                 onClick={() => navigate("/my-hub")}
                 className="px-6 py-3 border-2 border-green-500 text-green-600 rounded-xl font-medium hover:bg-green-50 transition-colors"
               >
@@ -349,25 +381,25 @@ const EditAdoption = () => {
   return (
     <>
       <Navbar />
-      
+
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white mt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
-              <button 
+              <button
                 onClick={() => navigate(-1)}
                 className="flex items-center text-emerald-600 hover:text-emerald-800 font-medium"
               >
                 <FiArrowLeft className="mr-2" /> Back
               </button>
-              
+
               <div className="flex items-center gap-4">
                 <div className="text-sm font-medium text-gray-600">
                   Step {step} of {MAX_STEPS}
                 </div>
                 <div className="w-32 bg-gray-200 rounded-full h-2.5">
-                  <motion.div 
+                  <motion.div
                     className="bg-emerald-500 h-2.5 rounded-full"
                     initial={{ width: "0%" }}
                     animate={{ width: `${progressPercentage}%` }}
@@ -376,10 +408,10 @@ const EditAdoption = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <motion.h1 
+                <motion.h1
                   className="text-3xl md:text-4xl font-bold text-gray-900"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -387,16 +419,17 @@ const EditAdoption = () => {
                 >
                   Edit Adoption Post
                 </motion.h1>
-                <motion.p 
+                <motion.p
                   className="mt-2 text-gray-600 max-w-xl"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Update your adoption post to help {formData.name} find a loving home
+                  Update your adoption post to help {formData.name} find a
+                  loving home
                 </motion.p>
               </div>
-              
+
               {originalData && (
                 <div className="flex items-center gap-4">
                   <motion.button
@@ -411,13 +444,16 @@ const EditAdoption = () => {
                   </motion.button>
                   <div className="text-sm text-gray-500">
                     <div>Posted: {formatDate(originalData.createdAt)}</div>
-                    <div>Views: {originalData.views} • Inquiries: {originalData.inquiries}</div>
+                    {/* <div> */}
+                    {/*   Views: {originalData.views} • Inquiries:{" "} */}
+                    {/*   {originalData.inquiries} */}
+                    {/* </div> */}
                   </div>
                 </div>
               )}
             </div>
           </div>
-          
+
           {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center">
@@ -425,9 +461,9 @@ const EditAdoption = () => {
               <span>{error}</span>
             </div>
           )}
-          
+
           {/* Form Content */}
-          <motion.div 
+          <motion.div
             className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -450,7 +486,8 @@ const EditAdoption = () => {
                       Post Updated!
                     </h3>
                     <p className="text-gray-600 max-w-md mx-auto mb-8">
-                      Your adoption post for {formData.name} has been successfully updated.
+                      Your adoption post for {formData.name} has been
+                      successfully updated.
                     </p>
                     <div className="flex justify-center gap-4">
                       <motion.button
@@ -490,7 +527,7 @@ const EditAdoption = () => {
                           <p className="text-gray-600 mb-6">
                             Update basic details about {formData.name}
                           </p>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -506,7 +543,7 @@ const EditAdoption = () => {
                                 placeholder="e.g. Max"
                               />
                             </div>
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Breed *
@@ -521,7 +558,7 @@ const EditAdoption = () => {
                                 placeholder="e.g. German Shepherd"
                               />
                             </div>
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Species *
@@ -538,7 +575,7 @@ const EditAdoption = () => {
                                 <option value="Turtle">Turtle</option>
                               </select>
                             </div>
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Age *
@@ -553,7 +590,7 @@ const EditAdoption = () => {
                                 placeholder="e.g. 3 years"
                               />
                             </div>
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Gender *
@@ -570,8 +607,7 @@ const EditAdoption = () => {
                                 <option value="Female">Female</option>
                               </select>
                             </div>
-                            
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Color *
@@ -586,7 +622,7 @@ const EditAdoption = () => {
                                 placeholder="e.g. Black & Tan"
                               />
                             </div>
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Weight
@@ -602,7 +638,7 @@ const EditAdoption = () => {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="flex justify-between">
                           <div></div>
                           <motion.button
@@ -611,7 +647,13 @@ const EditAdoption = () => {
                             className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
-                            disabled={!formData.name || !formData.breed || !formData.age || !formData.gender || !formData.color}
+                            disabled={
+                              !formData.name ||
+                              !formData.breed ||
+                              !formData.age ||
+                              !formData.gender ||
+                              !formData.color
+                            }
                           >
                             Next: Health & Traits
                             <FiArrowLeft className="transform rotate-180" />
@@ -619,7 +661,7 @@ const EditAdoption = () => {
                         </div>
                       </motion.div>
                     )}
-                    
+
                     {step === 2 && (
                       <motion.div
                         key="step2"
@@ -629,34 +671,53 @@ const EditAdoption = () => {
                         transition={{ duration: 0.3 }}
                         className="space-y-8"
                       >
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                        <div className="bg-gradient-to-r from-green-50 to-green-50 rounded-xl p-6 border border-green-200">
                           <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                            <FiHeart className="text-blue-500 w-6 h-6" />
+                            <FiHeart className="text-gray-500 w-6 h-6" />
                             Health & Personality
                           </h3>
                           <p className="text-gray-600 mb-6">
                             Update health details and personality traits
                           </p>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             {[
-                              { label: 'Vaccinated', name: 'vaccinated', icon: '💉' },
-                              { label: 'Neutered/Spayed', name: 'neutered', icon: '✂️' },
-                              { label: 'Microchipped', name: 'microchipped', icon: '🔬' }
+                              {
+                                label: "Vaccinated",
+                                name: "vaccinated",
+                                icon: "💉",
+                              },
+                              {
+                                label: "Neutered/Spayed",
+                                name: "neutered",
+                                icon: "✂️",
+                              },
+                              {
+                                label: "Microchipped",
+                                name: "microchipped",
+                                icon: "🔬",
+                              },
                             ].map((item, index) => (
-                              <div 
-                                key={index} 
-                                className={`p-4 rounded-xl border-2 flex items-center gap-3 cursor-pointer ${formData[item.name] ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}
-                                onClick={() => setFormData(prev => ({ ...prev, [item.name]: !prev[item.name] }))}
+                              <div
+                                key={index}
+                                className={`p-4 rounded-xl border-2 flex items-center gap-3 cursor-pointer ${formData[item.name] ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"}`}
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    [item.name]: !prev[item.name],
+                                  }))
+                                }
                               >
                                 <div className="text-2xl">{item.icon}</div>
                                 <div className="flex-1">
                                   <p className="font-medium">{item.label}</p>
                                   <p className="text-sm text-gray-500 mt-1">
-                                    {formData[item.name] ? 'Yes' : 'No'}
+                                    {formData[item.name] ? "Yes" : "No"}
                                   </p>
                                 </div>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formData[item.name] ? 'bg-green-500' : 'bg-gray-300'}`}>
+                                <div
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center ${formData[item.name] ? "bg-green-500" : "bg-gray-300"}`}
+                                >
                                   {formData[item.name] && (
                                     <FiCheck className="w-4 h-4 text-white" />
                                   )}
@@ -664,7 +725,7 @@ const EditAdoption = () => {
                               </div>
                             ))}
                           </div>
-                          
+
                           {/* <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Medical History
@@ -678,7 +739,7 @@ const EditAdoption = () => {
                               placeholder="Describe any medical conditions or treatments..."
                             ></textarea>
                           </div> */}
-                          
+
                           {/* <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Personality Traits
@@ -722,7 +783,7 @@ const EditAdoption = () => {
                               </button>
                             </div>
                           </div> */}
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Description *
@@ -733,12 +794,12 @@ const EditAdoption = () => {
                               onChange={handleInputChange}
                               required
                               rows="4"
-                              className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                              className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"
                               placeholder="Tell potential adopters about your pet..."
                             ></textarea>
                           </div>
                         </div>
-                        
+
                         <div className="flex justify-between">
                           <motion.button
                             type="button"
@@ -763,7 +824,7 @@ const EditAdoption = () => {
                         </div>
                       </motion.div>
                     )}
-                    
+
                     {step === 3 && (
                       <motion.div
                         key="step3"
@@ -773,20 +834,20 @@ const EditAdoption = () => {
                         transition={{ duration: 0.3 }}
                         className="space-y-8"
                       >
-                        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
+                        <div className="bg-gradient-to-r from-green-50 to-green-50 rounded-xl p-6 border border-green-200">
                           <h3 className="text-xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                            <FiImage className="text-purple-500 w-6 h-6" />
+                            <FiImage className="text-green-500 w-6 h-6" />
                             Images & Final Details
                           </h3>
                           <p className="text-gray-600 mb-6">
                             Update photos and final details
                           </p>
-                          
+
                           <div className="mb-8">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Current Photos
                             </label>
-                            
+
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                               {/* Existing images */}
                               {formData.keptImages.map((img, index) => (
@@ -796,21 +857,21 @@ const EditAdoption = () => {
                                   animate={{ opacity: 1, scale: 1 }}
                                   className="relative group"
                                 >
-                                  <img 
-                                    src={img} 
-                                    alt={`Preview ${index}`} 
+                                  <img
+                                    src={img}
+                                    alt={`Preview ${index}`}
                                     className="w-full h-40 object-cover rounded-xl border border-gray-200"
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => removeImage(img, 'existing')}
+                                    onClick={() => removeImage(img, "existing")}
                                     className="absolute top-2 right-2 bg-white/80 hover:bg-white p-1 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100"
                                   >
                                     <FiX className="w-4 h-4 text-gray-800" />
                                   </button>
                                 </motion.div>
                               ))}
-                              
+
                               {/* New images */}
                               {formData.newFiles.map((img, index) => (
                                 <motion.div
@@ -819,23 +880,27 @@ const EditAdoption = () => {
                                   animate={{ opacity: 1, scale: 1 }}
                                   className="relative group"
                                 >
-                                  <img 
-                                    src={img.preview} 
-                                    alt={`Preview ${index}`} 
+                                  <img
+                                    src={img.preview}
+                                    alt={`Preview ${index}`}
                                     className="w-full h-40 object-cover rounded-xl border border-gray-200"
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => removeImage(img.preview, 'new')}
+                                    onClick={() =>
+                                      removeImage(img.preview, "new")
+                                    }
                                     className="absolute top-2 right-2 bg-white/80 hover:bg-white p-1 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100"
                                   >
                                     <FiX className="w-4 h-4 text-gray-800" />
                                   </button>
                                 </motion.div>
                               ))}
-                              
+
                               {/* Add more button */}
-                              {(formData.keptImages.length + formData.newFiles.length) < 6 && (
+                              {formData.keptImages.length +
+                                formData.newFiles.length <
+                                6 && (
                                 <motion.div
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
@@ -843,11 +908,13 @@ const EditAdoption = () => {
                                   onClick={() => fileInputRef.current.click()}
                                 >
                                   <FiImage className="w-8 h-8 text-gray-400 mb-2" />
-                                  <span className="text-sm text-gray-500">Add Photo</span>
+                                  <span className="text-sm text-gray-500">
+                                    Add Photo
+                                  </span>
                                 </motion.div>
                               )}
                             </div>
-                            
+
                             <input
                               type="file"
                               ref={fileInputRef}
@@ -856,19 +923,21 @@ const EditAdoption = () => {
                               multiple
                               className="hidden"
                             />
-                            
+
                             {isUploading && (
                               <div className="text-center py-4">
                                 <div className="w-8 h-8 mx-auto border-t-2 border-emerald-500 border-solid rounded-full animate-spin"></div>
-                                <p className="mt-2 text-sm text-gray-500">Processing images...</p>
+                                <p className="mt-2 text-sm text-gray-500">
+                                  Processing images...
+                                </p>
                               </div>
                             )}
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <FiDollarSign className="text-purple-500" />
+                                <FiDollarSign className="text-green-500" />
                                 Adoption Fee
                               </label>
                               <input
@@ -876,14 +945,14 @@ const EditAdoption = () => {
                                 name="adoptionFee"
                                 value={formData.adoptionFee}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                 placeholder="e.g. $250"
                               />
                             </div>
-                            
+
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <FiMapPin className="text-purple-500" />
+                                <FiMapPin className="text-green-500" />
                                 Location *
                               </label>
                               <input
@@ -892,12 +961,12 @@ const EditAdoption = () => {
                                 value={formData.location}
                                 onChange={handleInputChange}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                 placeholder="e.g. San Francisco, CA"
                               />
                             </div>
                           </div>
-                          
+
                           <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl p-5 border border-emerald-200">
                             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                               <FiCalendar className="text-emerald-500" />
@@ -908,24 +977,32 @@ const EditAdoption = () => {
                                 <span className="w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
                                   1
                                 </span>
-                                <span>Your post will be reviewed by our team within 24 hours</span>
+                                <span>
+                                  Your post will be reviewed by our team within
+                                  24 hours
+                                </span>
                               </li>
                               <li className="flex items-start gap-2">
                                 <span className="w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
                                   2
                                 </span>
-                                <span>Potential adopters will contact you directly</span>
+                                <span>
+                                  Potential adopters will contact you directly
+                                </span>
                               </li>
                               <li className="flex items-start gap-2">
                                 <span className="w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
                                   3
                                 </span>
-                                <span>We recommend meeting adopters in a public place</span>
+                                <span>
+                                  We recommend meeting adopters in a public
+                                  place
+                                </span>
                               </li>
                             </ul>
                           </div>
                         </div>
-                        
+
                         <div className="flex justify-between">
                           <motion.button
                             type="button"
@@ -964,12 +1041,12 @@ const EditAdoption = () => {
             </div>
           </motion.div>
         </div>
-        
+
         {/* Stats Section */}
         <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white py-12 mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <motion.div 
+              <motion.div
                 className="text-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -978,7 +1055,7 @@ const EditAdoption = () => {
                 <div className="text-4xl font-bold mb-3">24h</div>
                 <p className="text-emerald-100">Average Response Time</p>
               </motion.div>
-              <motion.div 
+              <motion.div
                 className="text-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -987,7 +1064,7 @@ const EditAdoption = () => {
                 <div className="text-4xl font-bold mb-3">92%</div>
                 <p className="text-emerald-100">Adoption Success Rate</p>
               </motion.div>
-              <motion.div 
+              <motion.div
                 className="text-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -999,7 +1076,7 @@ const EditAdoption = () => {
             </div>
           </div>
         </div>
-        
+
         <Footer />
       </div>
     </>
@@ -1007,3 +1084,4 @@ const EditAdoption = () => {
 };
 
 export default EditAdoption;
+

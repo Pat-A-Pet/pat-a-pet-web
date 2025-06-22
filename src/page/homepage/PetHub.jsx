@@ -512,7 +512,6 @@ const MyHub = () => {
                   <h3 className="font-bold text-lg text-white">
                     {user.fullname}
                   </h3>
-                  <p className="text-white/80">Pet Lover since 2022</p>
                   <motion.button
                     className="mt-3 text-sm bg-white text-emerald-600 px-4 py-2 rounded-full font-medium shadow-md hover:shadow-lg transition-all"
                     whileHover={{ scale: 1.05 }}
@@ -529,7 +528,7 @@ const MyHub = () => {
         {/* Enhanced Tabs Navigation */}
         <div className="sticky top-0 z-10 bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex relative border-b border-gray-200 overflow-x-auto">
+            <div className="flex relative border-b border-gray-200 overflow-hidden">
               <div className="flex space-x-1">
                 {[
                   {
@@ -620,7 +619,7 @@ const MyHub = () => {
                     </p>
                   </div>
                   <motion.button
-                    onClick={() => navigate("/adopt")}
+                    onClick={() => navigate("/listing")}
                     className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -667,7 +666,7 @@ const MyHub = () => {
                       perfect companion!
                     </p>
                     <motion.button
-                      onClick={() => navigate("/adopt")}
+                      onClick={() => navigate("/listing")}
                       className="inline-flex items-center px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl shadow-md transition-all"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -807,7 +806,7 @@ const MyHub = () => {
                                   icon="heart"
                                   className="mr-2 text-red-400"
                                 />
-                                <span>{post.likes?.length || 0}</span>
+                                <span>{post.loves?.length || 0}</span>
                               </div>
                               <div className="flex items-center text-gray-500">
                                 <FaComment
@@ -965,22 +964,22 @@ const MyHub = () => {
                                 </div>
                                 <motion.span
                                   className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                    pet.status === "Available"
+                                    pet.status === "available"
                                       ? "bg-green-100 text-green-800"
-                                      : pet.status === "Adopted"
-                                        ? "bg-purple-100 text-purple-800"
-                                        : "bg-yellow-100 text-yellow-800"
+                                      : "bg-yellow-100 text-yellow-800"
                                   }`}
                                   whileHover={{ scale: 1.05 }}
                                 >
-                                  {pet.status}
+                                  {pet.status === "available"
+                                    ? "Available"
+                                    : "Adopted"}
                                 </motion.span>
                               </div>
 
                               <div className="mt-4 grid grid-cols-2 gap-4">
                                 <div>
                                   <p className="text-sm text-gray-500">Age</p>
-                                  <p className="font-medium">{pet.age}</p>
+                                  <p className="font-medium">{pet.age} years</p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-500">
@@ -988,20 +987,20 @@ const MyHub = () => {
                                   </p>
                                   <p className="font-medium">{pet.gender}</p>
                                 </div>
-                                <div>
-                                  <p className="text-sm text-gray-500">Views</p>
-                                  <p className="font-medium">
-                                    {pet.views || 0}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-500">
-                                    Inquiries
-                                  </p>
-                                  <p className="font-medium">
-                                    {pet.inquiries || 0}
-                                  </p>
-                                </div>
+                                {/* <div> */}
+                                {/*   <p className="text-sm text-gray-500">Views</p> */}
+                                {/*   <p className="font-medium"> */}
+                                {/*     {pet.views || 0} */}
+                                {/*   </p> */}
+                                {/* </div> */}
+                                {/* <div> */}
+                                {/*   <p className="text-sm text-gray-500"> */}
+                                {/*     Inquiries */}
+                                {/*   </p> */}
+                                {/*   <p className="font-medium"> */}
+                                {/*     {pet.inquiries || 0} */}
+                                {/*   </p> */}
+                                {/* </div> */}
                               </div>
 
                               <div className="mt-4 flex space-x-3">
@@ -1083,7 +1082,7 @@ const MyHub = () => {
                       Start browsing pets to find your new companion!
                     </p>
                     <motion.button
-                      onClick={() => navigate("/adopt")}
+                      onClick={() => navigate("/listing")}
                       className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -1267,7 +1266,7 @@ const MyHub = () => {
                                     {pet.name}
                                   </h3>
                                   <p className="text-gray-600">
-                                    {pet.breed} • {pet.age}
+                                    {pet.breed} • {pet.age} years
                                   </p>
                                 </div>
                                 <motion.span
@@ -1280,7 +1279,9 @@ const MyHub = () => {
                                   }`}
                                   whileHover={{ scale: 1.05 }}
                                 >
-                                  {pet.status}
+                                  {pet.status === "available"
+                                    ? "Available"
+                                    : "Adopted"}
                                 </motion.span>
                               </div>
 
@@ -1326,13 +1327,17 @@ const MyHub = () => {
                                             className={`px-3 py-1 rounded-full text-xs font-medium ${
                                               request.status === "pending"
                                                 ? "bg-yellow-100 text-yellow-800"
-                                                : request.status === "approved"
+                                                : request.status === "accepted"
                                                   ? "bg-green-100 text-green-800"
                                                   : "bg-red-100 text-red-800"
                                             }`}
                                             whileHover={{ scale: 1.05 }}
                                           >
-                                            {request.status}
+                                            {request.status === "pending"
+                                              ? "Pending"
+                                              : request.status === "rejected"
+                                                ? "Rejected"
+                                                : "Accepted"}
                                           </motion.span>
 
                                           {request.status === "pending" && (

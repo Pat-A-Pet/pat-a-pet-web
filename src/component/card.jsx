@@ -11,8 +11,8 @@ export default function Card({ pet }) {
   const { user } = useContext(UserContext);
   const [liked, setLiked] = useState(() => {
     try {
-      const userId = user?._id?.toString();
-      return pet?.loves?.some(id => id?.toString() === userId) || false;
+      const userId = user?.id?.toString();
+      return pet?.loves?.some((id) => id?.toString() === userId) || false;
     } catch (error) {
       console.error("Error checking initial like status:", error);
       return false;
@@ -29,20 +29,20 @@ export default function Card({ pet }) {
     weight: "65 lbs",
     location: "Indonesia",
     images: ["german.webp"],
-    _id: "default"
+    _id: "default",
   };
 
   const displayPet = pet || defaultPet;
 
   const handleToggleLove = async (e) => {
     e.stopPropagation();
-    
+
     // Don't proceed if no user or it's the default pet
     if (!user) {
       alert("Please log in to use favorites.");
       return;
     }
-    
+
     if (displayPet._id === "default") {
       return;
     }
@@ -64,15 +64,19 @@ export default function Card({ pet }) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       // Safely update based on server response
-      const userId = user._id?.toString();
-      const isLiked = data.loves?.some(id => id?.toString() === userId) || false;
+      const userId = user.id?.toString();
+      const isLiked =
+        data.loves?.some((id) => id?.toString() === userId) || false;
       setLiked(isLiked);
     } catch (err) {
-      console.error("Error toggling favorite:", err.response?.data || err.message);
+      console.error(
+        "Error toggling favorite:",
+        err.response?.data || err.message,
+      );
       setLiked(!optimisticLiked); // Revert on error
       alert("Failed to update favorite. Please try again.");
     } finally {
@@ -95,7 +99,9 @@ export default function Card({ pet }) {
           onClick={handleToggleLove}
           disabled={saving || displayPet._id === "default" || !user}
           className={`bg-transparent border-none transform transition-all duration-300 hover:scale-110 focus:outline-none ${
-            displayPet._id === "default" || !user ? "opacity-50 cursor-not-allowed" : ""
+            displayPet._id === "default" || !user
+              ? "opacity-50 cursor-not-allowed"
+              : ""
           }`}
           aria-label={liked ? "Remove from favorites" : "Add to favorites"}
         >
@@ -152,11 +158,11 @@ export default function Card({ pet }) {
             <div className="grid grid-cols-2 gap-3 text-white/80 text-xs">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
                 <span className="block font-medium text-white">Age</span>
-                <span>{displayPet.age || "Unknown"}</span>
+                <span>{displayPet.age || "Unknown"} years</span>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
                 <span className="block font-medium text-white">Weight</span>
-                <span>{displayPet.weight || "Unknown"}</span>
+                <span>{displayPet.weight || "Unknown"} kg</span>
               </div>
             </div>
           </div>
@@ -206,3 +212,4 @@ export default function Card({ pet }) {
     </div>
   );
 }
+

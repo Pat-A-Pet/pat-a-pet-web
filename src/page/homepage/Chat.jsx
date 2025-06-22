@@ -21,7 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { StreamChat } from "stream-chat";
 import axios from "axios";
 
-const STREAM_CHAT_API_KEY = "d2nrfjcvqrjy";
+const STREAM_CHAT_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
 const ChatPage = () => {
   const { user, loading: userLoading } = useContext(UserContext);
@@ -43,8 +43,6 @@ const ChatPage = () => {
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
-
-  // Handle user loading state
 
   const getOtherMember = (channel, currentUserId) => {
     if (!channel?.state?.members) return null;
@@ -68,7 +66,7 @@ const ChatPage = () => {
       id: channel.id,
       channel: channel,
       user: {
-        id: otherMember?.user._id,
+        id: otherMember?.user.id,
         name: otherMember?.user?.name || "Unknown User",
         image:
           otherMember?.user?.image ||
@@ -85,34 +83,41 @@ const ChatPage = () => {
     };
   };
 
-  // Initialize Stream Chat client
+  // Initialize Stream Chat client - FIXED VERSION
   useEffect(() => {
     let isMounted = true;
     const token = localStorage.getItem("token");
 
     const initializeChat = async () => {
-      if (!token) {
+      if (!user?.id || !token) {
         if (isMounted) {
           setLoading((prev) => ({ ...prev, client: false }));
-          setError("User not logged in");
+          if (!token) setError("User not logged in");
         }
         return;
       }
 
       try {
-        // Skip if already connected
-        if (streamClient?.user?.id === user?.id) {
+        // Skip if already connected with the same user
+        if (streamClient?.user?.id === user.id) {
           if (isMounted) setLoading((prev) => ({ ...prev, client: false }));
           return;
         }
 
+        console.log("Initializing Stream Chat for user:", user.id);
+
         const chatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
+
+        // Get Stream Chat token from your backend
         const tokenResponse = await axios.post(
           "http://localhost:5000/api/chat/chatToken",
-          { userId: user?.id },
+          { userId: user.id },
           { headers: { Authorization: `Bearer ${token}` } },
         );
 
+        console.log("Got Stream token, connecting user...");
+
+        // Connect user to Stream Chat
         await chatClient.connectUser(
           {
             id: user.id,
@@ -123,6 +128,8 @@ const ChatPage = () => {
           },
           tokenResponse.data.token,
         );
+
+        console.log("Stream Chat connected successfully");
 
         if (isMounted) {
           setStreamClient(chatClient);
@@ -135,38 +142,59 @@ const ChatPage = () => {
             localStorage.removeItem("token");
             navigate("/signin");
           }
-          setError("Failed to connect to chat service");
+          setError(`Failed to connect to chat service: ${err.message}`);
           setLoading((prev) => ({ ...prev, client: false }));
         }
       }
     };
 
-    initializeChat();
+    // Only initialize if user is loaded and not already loading
+    if (!userLoading && user) {
+      initializeChat();
+    }
 
     return () => {
       isMounted = false;
+      // Cleanup will be handled by the disconnect effect below
+    };
+  }, [user?.id, navigate, userLoading]);
+
+  // Cleanup effect for Stream client
+  useEffect(() => {
+    return () => {
       if (streamClient && streamClient.userID) {
+        console.log("Disconnecting Stream Chat client");
         streamClient.disconnectUser().catch(console.error);
       }
     };
-  }, [user?.id, navigate, userLoading]);
+  }, [streamClient]);
 
   // Load conversations
   useEffect(() => {
     const loadConversations = async () => {
-      if (!streamClient || !user?.id) return;
+      if (!streamClient || !streamClient.userID || !user?.id) {
+        console.log("Skipping conversation load - client or user not ready");
+        return;
+      }
 
       try {
+        console.log("Loading conversations for user:", user.id);
         setLoading((prev) => ({ ...prev, conversations: true }));
+
         const channels = await streamClient.queryChannels(
           { members: { $in: [user.id] } },
           { last_message_at: -1 },
           { watch: true, state: true },
         );
 
-        setConversations(
-          channels.map((channel) => formatConversation(channel, user.id)),
+        console.log("Loaded channels:", channels.length);
+
+        const formattedConversations = channels.map((channel) =>
+          formatConversation(channel, user.id),
         );
+
+        setConversations(formattedConversations);
+        setError(null); // Clear any previous errors
       } catch (err) {
         console.error("Failed to load conversations:", err);
         setError("Failed to load conversations");
@@ -175,15 +203,17 @@ const ChatPage = () => {
       }
     };
 
-    if (streamClient) loadConversations();
+    loadConversations();
   }, [streamClient, user?.id]);
 
-  // Load channel
+  // Load specific channel
   useEffect(() => {
     const loadChannel = async () => {
       if (!streamClient || !streamClient.userID) {
+        console.log("Stream client not ready for channel load");
         setActiveChannel(null);
         setMessages([]);
+        setLoading((prev) => ({ ...prev, messages: false }));
         return;
       }
 
@@ -191,24 +221,40 @@ const ChatPage = () => {
         setLoading((prev) => ({ ...prev, messages: true }));
 
         if (channelId) {
+          console.log("Loading channel:", channelId);
+
           const channel = streamClient.channel("messaging", channelId);
           await channel.watch();
+
+          console.log(
+            "Channel loaded, messages:",
+            channel.state.messages?.length || 0,
+          );
+
           setMessages(channel.state.messages || []);
           setActiveChannel(channel);
 
-          const handleMessage = (event) =>
+          // Set up real-time message listeners
+          const handleMessage = (event) => {
+            console.log("New message received:", event.message);
             setMessages((prev) => [...prev, event.message]);
-          const handleMessageUpdated = (event) =>
+          };
+
+          const handleMessageUpdated = (event) => {
+            console.log("Message updated:", event.message);
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === event.message.id ? event.message : msg,
               ),
             );
+          };
 
           channel.on("message.new", handleMessage);
           channel.on("message.updated", handleMessageUpdated);
 
+          // Return cleanup function
           return () => {
+            console.log("Cleaning up channel listeners");
             channel.off("message.new", handleMessage);
             channel.off("message.updated", handleMessageUpdated);
           };
@@ -218,16 +264,16 @@ const ChatPage = () => {
         }
       } catch (err) {
         console.error("Failed to load channel:", err);
-        setError("Failed to load chat");
+        setError(`Failed to load chat: ${err.message}`);
       } finally {
         setLoading((prev) => ({ ...prev, messages: false }));
       }
     };
 
     loadChannel();
-  }, [streamClient, channelId]);
+  }, [streamClient, channelId, user?.id]);
 
-  // Auto scroll and textarea resize effects remain the same
+  // Auto scroll and textarea resize effects
   useEffect(() => scrollToBottom(), [messages]);
   useEffect(() => {
     if (textareaRef.current) {
@@ -243,7 +289,9 @@ const ChatPage = () => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!messageInput.trim() || !activeChannel) return;
+
     try {
+      console.log("Sending message:", messageInput.trim());
       await activeChannel.sendMessage({ text: messageInput.trim() });
       setMessageInput("");
     } catch (err) {
@@ -252,11 +300,12 @@ const ChatPage = () => {
     }
   };
 
+  // Create new channel function (you can uncomment and modify as needed)
   const createNewChannel = async (petId, otherUserId) => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/chat/create-channel",
-        { petId, requesterId: user._id, ownerId: otherUserId },
+        { petId, requesterId: user.id, ownerId: otherUserId },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },
@@ -274,6 +323,7 @@ const ChatPage = () => {
       conv.pet.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen flex-col">
@@ -296,18 +346,11 @@ const ChatPage = () => {
     );
   }
 
-  if (loading.client && !streamClient) {
+  // Loading states
+  if ((loading.client && !streamClient) || userLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Connecting to chat...</p>
-      </div>
-    );
-  }
-
-  if (userLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading user data...</p>
+        <p>{userLoading ? "Loading user data..." : "Connecting to chat..."}</p>
       </div>
     );
   }
@@ -337,23 +380,24 @@ const ChatPage = () => {
           >
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between mb-6">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5 text-gray-600" />
-                </button>
+                {/* <button */}
+                {/*   onClick={() => navigate(-1)} */}
+                {/*   className="p-2 rounded-full hover:bg-gray-100 transition-colors" */}
+                {/* > */}
+                {/*   <ArrowLeft className="w-5 h-5 text-gray-600" /> */}
+                {/* </button> */}
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
                   Messages
                 </h1>
-                <button
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  onClick={() => {
-                    /* Implement new chat modal */
-                  }}
-                >
-                  <FiPlusCircle className="w-5 h-5 text-emerald-600" />
-                </button>
+                {/* <button */}
+                {/*   className="p-2 rounded-full hover:bg-gray-100 transition-colors" */}
+                {/*   onClick={() => { */}
+                {/*     // You can implement new chat modal here */}
+                {/*     console.log("New chat clicked"); */}
+                {/*   }} */}
+                {/* > */}
+                {/*   <FiPlusCircle className="w-5 h-5 text-emerald-600" /> */}
+                {/* </button> */}
               </div>
 
               <div className="relative">
@@ -372,6 +416,16 @@ const ChatPage = () => {
               {loading.conversations ? (
                 <div className="flex items-center justify-center h-full">
                   <p>Loading conversations...</p>
+                </div>
+              ) : filteredConversations.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-center p-4">
+                  <div>
+                    <FiMessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No conversations yet</p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      Start a new chat to begin messaging
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <AnimatePresence>
@@ -460,7 +514,7 @@ const ChatPage = () => {
                       <div className="flex items-center gap-3">
                         <img
                           src={
-                            getOtherMember(activeChannel, user._id)?.user
+                            getOtherMember(activeChannel, user.id)?.user
                               ?.image || "https://via.placeholder.com/150"
                           }
                           alt="User"
@@ -468,7 +522,7 @@ const ChatPage = () => {
                         />
                         <div>
                           <h3 className="font-semibold text-gray-900">
-                            {getOtherMember(activeChannel, user._id)?.user
+                            {getOtherMember(activeChannel, user.id)?.user
                               ?.name || "Unknown User"}
                           </h3>
                           <p className="text-xs text-gray-500">
@@ -481,17 +535,17 @@ const ChatPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 rounded-full hover:bg-gray-100 text-emerald-600 transition-colors">
-                        <FiPhone className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 rounded-full hover:bg-gray-100 text-emerald-600 transition-colors">
-                        <FiVideo className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                        <FiMoreVertical className="w-5 h-5 text-gray-600" />
-                      </button>
-                    </div>
+                    {/* <div className="flex items-center gap-2"> */}
+                    {/*   <button className="p-2 rounded-full hover:bg-gray-100 text-emerald-600 transition-colors"> */}
+                    {/*     <FiPhone className="w-5 h-5" /> */}
+                    {/*   </button> */}
+                    {/*   <button className="p-2 rounded-full hover:bg-gray-100 text-emerald-600 transition-colors"> */}
+                    {/*     <FiVideo className="w-5 h-5" /> */}
+                    {/*   </button> */}
+                    {/*   <button className="p-2 rounded-full hover:bg-gray-100 transition-colors"> */}
+                    {/*     <FiMoreVertical className="w-5 h-5 text-gray-600" /> */}
+                    {/*   </button> */}
+                    {/* </div> */}
                   </div>
 
                   {/* Messages */}
@@ -503,7 +557,7 @@ const ChatPage = () => {
                         </div>
                       )}
                       {messages.map((msg) => {
-                        const isCurrentUser = msg.user.id === user._id;
+                        const isCurrentUser = msg.user.id === user.id;
                         return (
                           <motion.div
                             key={msg.id}
@@ -527,7 +581,7 @@ const ChatPage = () => {
                             >
                               {!isCurrentUser && (
                                 <div className="text-xs font-medium text-gray-500 mb-1">
-                                  {getOtherMember(activeChannel, user._id)?.user
+                                  {getOtherMember(activeChannel, user.id)?.user
                                     ?.name || "Unknown User"}
                                 </div>
                               )}
@@ -649,4 +703,3 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
-

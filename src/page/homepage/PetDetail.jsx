@@ -289,22 +289,30 @@ export default function PetDetail() {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Age</p>
-                    <p className="font-bold text-gray-900">{petData.age}</p>
+                    <p className="font-bold text-gray-900">
+                      {petData.age} years
+                    </p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Gender</p>
                     <p className="font-bold text-gray-900">{petData.gender}</p>
                   </div>
-                  {/* <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Size</p>
-                    <p className="font-bold text-gray-900">{petData.size}</p>
-                  </div> */}
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Weight</p>
-                    <p className="font-bold text-gray-900">{petData.weight}</p>
+                    <p className="font-bold text-gray-900">
+                      {petData.weight} kg
+                    </p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Status</p>
+                    <p
+                      className={`font-bold text-gray-900 ${petData.status === "available" ? "" : "bg-[#A0C878] rounded-lg text-white"}`}
+                    >
+                      {petData.status === "available" ? "Available" : "Adopted"}
+                    </p>
                   </div>
                 </div>
 
@@ -316,7 +324,10 @@ export default function PetDetail() {
                         Adoption Fee
                       </p>
                       <p className="text-3xl font-bold text-green-800">
-                        ${petData.adoptionFee}
+                        Rp.{" "}
+                        {new Intl.NumberFormat("en-EN").format(
+                          petData.adoptionFee,
+                        )}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -380,7 +391,7 @@ export default function PetDetail() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex-1 px-6 py-4 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                         activeTab === tab.id
-                          ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                          ? "text-gray-500 border-b-2 border-[#A0C878]"
                           : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                       }`}
                     >
@@ -419,7 +430,7 @@ export default function PetDetail() {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Age:</span>
                             <span className="font-medium text-gray-900">
-                              {petData.age}
+                              {petData.age} years
                             </span>
                           </div>
                         </div>
@@ -433,7 +444,7 @@ export default function PetDetail() {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Weight:</span>
                             <span className="font-medium text-gray-900">
-                              {petData.weight}
+                              {petData.weight} kg
                             </span>
                           </div>
                           {/* <div className="flex justify-between">
@@ -568,4 +579,3 @@ export default function PetDetail() {
     </>
   );
 }
-

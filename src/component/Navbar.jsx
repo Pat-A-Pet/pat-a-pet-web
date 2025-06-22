@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, User, LogOut, Settings, HelpCircle } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../handler/AuthHandler";
 import { UserContext } from "../context/UserContext";
@@ -43,7 +43,6 @@ const Navbar = () => {
     setProfileDropdownOpen(false);
   };
 
-  // Scroll to section function for landing page
   const scrollTo = (id) => {
     if (location.pathname === "/") {
       const element = document.getElementById(id);
@@ -56,14 +55,12 @@ const Navbar = () => {
     }
   };
 
-  // Landing page links (shown when not authenticated)
   const landingLinks = [
     { id: "hero", label: "Home" },
     { id: "pets", label: "Our Pets" },
     { id: "community", label: "Community" },
   ];
 
-  // App links (shown when authenticated)
   const appLinks = [
     { path: "/", label: "Home" },
     { path: "/listing", label: "Listing" },
@@ -73,24 +70,21 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="fixed top-0 w-full z-50 px-4 py-3">
+    <header className="fixed top-0 w-full z-50 px-3 sm:px-4 py-2 sm:py-3">
       <div
         className={`max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
           isScrolled
-            ? "bg-white/40 shadow-md backdrop-blur-sm rounded-full px-6 py-3"
+            ? "bg-white/40 shadow-md backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3"
             : "bg-transparent"
         }`}
       >
-        {/* Logo */}
+        {/* Logo - Made responsive with smaller size on mobile */}
         <div className="flex-1">
-          <Link
-            to={"/"}
-            className="text-2xl font-bold text-gray-800 dark:text-white"
-          >
+          <Link to={"/"} className="text-2xl font-bold text-gray-800">
             <motion.img
-              src="logo-removebg.png"
+              src="/logo-removebg.png"
               alt="pat-a-pet"
-              className="w-40"
+              className="w-32 sm:w-40" // Smaller on mobile
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             />
@@ -112,7 +106,7 @@ const Navbar = () => {
                 {isAuthenticated ? (
                   <Link
                     to={link.path}
-                    className={`nav-link relative z-10 px-1 py-2 transition-all duration-200 ${
+                    className={`nav-link relative z-10 px-1 py-2 text-sm sm:text-base ${
                       isActive ? "text-black font-medium" : "text-black"
                     } cursor-pointer`}
                   >
@@ -121,7 +115,7 @@ const Navbar = () => {
                 ) : (
                   <button
                     onClick={() => scrollTo(link.id)}
-                    className={`nav-link relative z-10 px-1 py-2 transition-all duration-200 ${
+                    className={`nav-link relative z-10 px-1 py-2 text-sm sm:text-base ${
                       isActive ? "text-white font-medium" : "text-black"
                     } cursor-pointer`}
                   >
@@ -142,18 +136,18 @@ const Navbar = () => {
         </div>
 
         {/* Right Side - Auth Buttons or Profile */}
-        <div className="hidden md:flex flex-1 justify-end items-center gap-4">
+        <div className="hidden md:flex flex-1 justify-end items-center gap-2 sm:gap-4">
           {!isAuthenticated ? (
             <>
               <button
                 onClick={() => navigate("/signin")}
-                className="cursor-pointer bg-white text-[#A0C878] border-2 border-[#A0C878] hover:bg-[#A0C878] hover:text-white px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+                className="cursor-pointer bg-white text-[#A0C878] border-2 border-[#A0C878] hover:bg-[#A0C878] hover:text-white px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Sign In
               </button>
               <button
                 onClick={() => navigate("/signup")}
-                className="cursor-pointer bg-white text-[#A0C878] border-2 border-[#A0C878] hover:bg-[#A0C878] hover:text-white px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+                className="cursor-pointer bg-white text-[#A0C878] border-2 border-[#A0C878] hover:bg-[#A0C878] hover:text-white px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Sign Up
               </button>
@@ -164,9 +158,9 @@ const Navbar = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full cursor-pointer"
+                className="bg-indigo-100 p-2 rounded-full cursor-pointer"
               >
-                <User className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
               </motion.button>
 
               <AnimatePresence>
@@ -175,51 +169,23 @@ const Navbar = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className=" absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-50 overflow-hidden"
+                    className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl z-50 overflow-hidden"
                   >
-                    {/* TODO: Profile dropdown content remains the same */}
-                    {/* Replace the above line with this: */}
                     <div className="py-1">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">
+                      <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-100">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900">
                           Welcome, {user.fullname}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-[10px] sm:text-xs text-gray-500 truncate">
                           {user?.email}
                         </p>
-                      </div>
-                      <div className="py-1">
-                        {/* <Link */}
-                        {/*   to="/profile" */}
-                        {/*   onClick={() => setProfileDropdownOpen(false)} */}
-                        {/*   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left" */}
-                        {/* > */}
-                        {/*   <User className="w-4 h-4 mr-3" /> */}
-                        {/*   Your Profile */}
-                        {/* </Link> */}
-                        {/* <Link */}
-                        {/*   to="/settings" */}
-                        {/*   onClick={() => setProfileDropdownOpen(false)} */}
-                        {/*   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left" */}
-                        {/* > */}
-                        {/*   <Settings className="w-4 h-4 mr-3" /> */}
-                        {/*   Settings */}
-                        {/* </Link> */}
-                        {/* <Link */}
-                        {/*   to="/help" */}
-                        {/*   onClick={() => setProfileDropdownOpen(false)} */}
-                        {/*   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left" */}
-                        {/* > */}
-                        {/*   <HelpCircle className="w-4 h-4 mr-3" /> */}
-                        {/*   Help */}
-                        {/* </Link> */}
                       </div>
                       <div className="py-1 border-t border-gray-100">
                         <button
                           onClick={handleLogout}
-                          className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                          className="flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 hover:bg-gray-100 w-full text-left"
                         >
-                          <LogOut className="w-4 h-4 mr-3" />
+                          <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
                           Sign out
                         </button>
                       </div>
@@ -233,19 +199,19 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <motion.button
-          className="md:hidden text-gray-700 dark:text-white z-50"
+          className="md:hidden text-gray-700 z-50"
           onClick={() => setMenuOpen(!menuOpen)}
           whileTap={{ scale: 0.9 }}
         >
           {menuOpen ? (
-            <X size={28} className="text-indigo-600 dark:text-indigo-400" />
+            <X size={24} className="text-[#A0C878]" /> // Smaller icon on mobile
           ) : (
-            <Menu size={28} />
+            <Menu size={24} /> // Smaller icon on mobile
           )}
         </motion.button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Improved with smaller text and better spacing */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -267,9 +233,9 @@ const Navbar = () => {
                 opacity: { duration: 0.1 },
               },
             }}
-            className="md:hidden bg-white dark:bg-gray-900 shadow-xl rounded-b-xl overflow-hidden"
+            className="md:hidden bg-white shadow-xl rounded-b-xl overflow-hidden"
           >
-            <nav className="flex flex-col py-4">
+            <nav className="flex flex-col">
               {(isAuthenticated ? appLinks : landingLinks).map(
                 (link, index) => {
                   const isActive = isAuthenticated
@@ -290,17 +256,17 @@ const Navbar = () => {
                       {isAuthenticated ? (
                         <Link
                           to={link.path}
-                          className={`mobile-link flex items-center py-4 px-8 ${
+                          className={`flex items-center py-3 px-6 text-sm ${
                             isActive
-                              ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30"
-                              : "text-gray-600 dark:text-gray-300"
+                              ? "text-gray-800 font-medium"
+                              : "text-gray-600"
                           }`}
                           onClick={() => setMenuOpen(false)}
                         >
                           {isActive && (
                             <motion.div
                               layoutId="mobile-active-indicator"
-                              className="w-2 h-2 rounded-full bg-indigo-500 dark:bg-indigo-400 mr-3"
+                              className="w-1.5 h-1.5 rounded-full bg-[#A0C878] mr-2"
                             />
                           )}
                           {link.label}
@@ -308,16 +274,16 @@ const Navbar = () => {
                       ) : (
                         <button
                           onClick={() => scrollTo(link.id)}
-                          className={`mobile-link flex items-center py-4 px-8 w-full text-left ${
+                          className={`flex items-center py-3 px-6 w-full text-left text-sm ${
                             isActive
-                              ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30"
-                              : "text-gray-600 dark:text-gray-300"
+                              ? "text-[#A0C878] font-medium bg-[#A0C878]/10"
+                              : "text-gray-600"
                           }`}
                         >
                           {isActive && (
                             <motion.div
                               layoutId="mobile-active-indicator"
-                              className="w-2 h-2 rounded-full bg-indigo-500 dark:bg-indigo-400 mr-3"
+                              className="w-1.5 h-1.5 rounded-full bg-[#A0C878] mr-2"
                             />
                           )}
                           {link.label}
@@ -330,13 +296,13 @@ const Navbar = () => {
 
               {/* Auth buttons or profile options */}
               {!isAuthenticated ? (
-                <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2 px-4 py-2 flex gap-2">
+                <div className="border-t border-gray-200 mt-2 pt-2 px-3 py-2 flex gap-2">
                   <button
                     onClick={() => {
                       navigate("/signin");
                       setMenuOpen(false);
                     }}
-                    className="flex-1 bg-[#A0C878] text-white py-2 rounded-full text-sm font-medium"
+                    className="flex-1 bg-[#A0C878] text-white py-2 rounded-full text-xs sm:text-sm font-medium"
                   >
                     Sign In
                   </button>
@@ -345,32 +311,32 @@ const Navbar = () => {
                       navigate("/signup");
                       setMenuOpen(false);
                     }}
-                    className="flex-1 bg-white text-[#A0C878] border border-[#A0C878] py-2 rounded-full text-sm font-medium"
+                    className="flex-1 bg-white text-[#A0C878] border border-[#A0C878] py-2 rounded-full text-xs sm:text-sm font-medium"
                   >
                     Sign Up
                   </button>
                 </div>
               ) : (
-                <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
+                <div className="border-t border-gray-200 mt-2">
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     className="py-1"
                   >
-                    <div className="px-8 py-4 border-t border-gray-200 dark:border-gray-700">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {user?.fullName || user?.username || "User"}
+                    <div className="px-6 py-3">
+                      <p className="text-xs sm:text-sm font-medium text-gray-900">
+                        Welcome {user?.fullname || user?.username || "User"}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      <p className="text-[10px] sm:text-xs text-gray-500 truncate">
                         {user?.email}
                       </p>
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center px-8 py-4 w-full text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="flex items-center px-6 py-3 w-full text-left text-xs sm:text-sm text-red-600 hover:bg-gray-100"
                     >
-                      <LogOut className="w-4 h-4 mr-3" />
+                      <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Sign out
                     </button>
                   </motion.div>

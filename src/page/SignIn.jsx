@@ -4,6 +4,7 @@ import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
+import { StreamChat } from "stream-chat";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -12,10 +13,12 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { fetchUser } = useContext(UserContext);
+  const STREAM_CHAT_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      // 1. Sign in to your backend
       const response = await axios.post(
         "http://localhost:5000/api/auth/signin",
         {
@@ -25,15 +28,41 @@ export default function SignIn() {
       );
 
       const { token } = response.data;
-
       localStorage.setItem("token", token);
-      await fetchUser(); // ✅ fetch user data into context
 
+      // 2. Fetch user data into context
+      await fetchUser();
+
+      // 3. Connect to Stream Chat
+      const chatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
+      const tokenResponse = await axios.post(
+        "http://localhost:5000/api/chat/chatToken",
+        { userId: response.data.user._id }, // Assuming your backend returns userId in the signin response
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      await chatClient.connectUser(
+        {
+          id: response.data.user._id,
+          name: response.data.user.fullname || email,
+          image:
+            response.data.user.profilePicture ||
+            `https://getstream.io/random_png/?id=${response.data.userId}&name=${response.data.fullname || email}`,
+        },
+        tokenResponse.data.token,
+      );
+
+      // 4. Navigate to home and reload
       navigate("/");
-      window.location.reload(); // Then reload the page
+      window.location.reload();
     } catch (err) {
       console.error(err.response?.data?.error || err.message);
       setError(err.response?.data?.error || "Something went wrong");
+
+      // Disconnect from Stream if connection was partially established
+      if (StreamChat.getInstance(STREAM_CHAT_API_KEY).userID) {
+        StreamChat.getInstance(STREAM_CHAT_API_KEY).disconnectUser();
+      }
     }
   };
 

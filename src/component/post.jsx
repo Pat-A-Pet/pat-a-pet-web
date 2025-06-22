@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import { 
-  Heart, 
-  MessageCircle, 
-  Share2, 
-  MoreHorizontal, 
-  Bookmark, 
-  ChevronLeft, 
-  ChevronRight 
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  MoreHorizontal,
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
@@ -22,22 +22,23 @@ export default function PostCard({ post }) {
   const [likeCount, setLikeCount] = useState(post?.loves?.length || 0);
   const [isLiking, setIsLiking] = useState(false);
   const [isCommenting, setIsCommenting] = useState(false);
-  
+
   // Use post images if available, otherwise default images
-  const postImages = post?.imageUrls?.length > 0 
-    ? post.imageUrls 
-    : ["/german.webp", "/dog2.jpg", "/dog3.jpg", "/dog4.jpg"];
+  const postImages =
+    post?.imageUrls?.length > 0
+      ? post.imageUrls
+      : ["/german.webp", "/dog2.jpg", "/dog3.jpg", "/dog4.jpg"];
 
   // Initialize liked state based on whether user has already liked the post
   useEffect(() => {
-    if (!user?._id || !post?.loves) return;
-    
+    if (!user?.id || !post?.loves) return;
+
     // Convert both IDs to strings for reliable comparison
-    const userId = user._id.toString();
-    const userLiked = post.loves.some(loveId => 
-      loveId && loveId.toString() === userId
+    const userId = user.id.toString();
+    const userLiked = post.loves.some(
+      (loveId) => loveId && loveId.toString() === userId,
     );
-    
+
     setLiked(userLiked);
   }, [user, post]);
 
@@ -51,22 +52,22 @@ export default function PostCard({ post }) {
       setIsLiking(true);
       // Optimistic UI update
       setLiked(!liked);
-      setLikeCount(prev => liked ? prev - 1 : prev + 1);
+      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
 
       const headers = {
-        Authorization: `Bearer ${user.token}`
+        Authorization: `Bearer ${user.token}`,
       };
 
       await axios.post(
         `http://localhost:5000/api/posts/post-love/${post._id}`,
         {},
-        { headers }
+        { headers },
       );
     } catch (err) {
       console.error("Error liking post:", err);
       // Revert on error
-      setLiked(prev => !prev);
-      setLikeCount(prev => liked ? prev + 1 : prev - 1);
+      setLiked((prev) => !prev);
+      setLikeCount((prev) => (liked ? prev + 1 : prev - 1));
       alert("Failed to like post");
     } finally {
       setIsLiking(false);
@@ -75,7 +76,7 @@ export default function PostCard({ post }) {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!newComment.trim()) return;
     if (!user || !user.token) {
       alert("Please login to comment");
@@ -85,13 +86,13 @@ export default function PostCard({ post }) {
     try {
       setIsCommenting(true);
       const headers = {
-        Authorization: `Bearer ${user.token}`
+        Authorization: `Bearer ${user.token}`,
       };
 
       const response = await axios.post(
         `http://localhost:5000/api/posts/post-comments/${post._id}`,
         { comment: newComment },
-        { headers }
+        { headers },
       );
 
       // Update comments from response
@@ -100,7 +101,7 @@ export default function PostCard({ post }) {
       } else if (response.data) {
         setComments(response.data.comments || []);
       }
-      
+
       setNewComment("");
     } catch (err) {
       console.error("Error posting comment:", err);
@@ -111,14 +112,14 @@ export default function PostCard({ post }) {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === postImages.length - 1 ? 0 : prevIndex + 1
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === postImages.length - 1 ? 0 : prevIndex + 1,
     );
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === 0 ? postImages.length - 1 : prevIndex - 1
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? postImages.length - 1 : prevIndex - 1,
     );
   };
 
@@ -137,9 +138,11 @@ export default function PostCard({ post }) {
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">{post?.author?.fullname || "Anonymous"}</h3>
+              <h3 className="font-semibold text-gray-900 text-sm">
+                {post?.author?.fullname || "Anonymous"}
+              </h3>
               <p className="text-gray-500 text-xs">
-                {new Date(post?.createdAt).toLocaleString()} • 
+                {new Date(post?.createdAt).toLocaleString()} •
               </p>
             </div>
           </div>
@@ -153,7 +156,7 @@ export default function PostCard({ post }) {
           <p className="text-gray-800 text-sm leading-relaxed mb-3">
             {post?.captions || "No caption provided"}
           </p>
-          
+
           {/* Post Images Carousel */}
           {postImages.length > 0 && (
             <div className="relative rounded-xl overflow-hidden mb-3 group cursor-pointer">
@@ -162,32 +165,38 @@ export default function PostCard({ post }) {
                 alt={`Post ${currentImageIndex + 1}`}
                 className="w-full h-64 object-cover transition-all duration-500"
               />
-              
+
               {postImages.length > 1 && (
                 <>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prevImage();
+                    }}
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextImage();
+                    }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </>
               )}
-              
+
               {postImages.length > 1 && (
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                   {postImages.map((_, index) => (
-                    <div 
+                    <div
                       key={index}
                       className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentImageIndex 
-                          ? "bg-white w-3" 
+                        index === currentImageIndex
+                          ? "bg-white w-3"
                           : "bg-white/50"
                       }`}
                     />
@@ -206,20 +215,22 @@ export default function PostCard({ post }) {
                 onClick={handleLike}
                 disabled={isLiking}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                  liked 
-                    ? 'text-red-500 bg-red-50 hover:bg-red-100' 
-                    : 'text-gray-600 hover:text-red-500 hover:bg-red-50'
+                  liked
+                    ? "text-red-500 bg-red-50 hover:bg-red-100"
+                    : "text-gray-600 hover:text-red-500 hover:bg-red-50"
                 }`}
               >
-                <Heart className={`w-5 h-5 transition-all duration-200 ${liked ? 'fill-current scale-110' : ''}`} />
+                <Heart
+                  className={`w-5 h-5 transition-all duration-200 ${liked ? "fill-current scale-110" : ""}`}
+                />
                 <span className="text-sm font-medium">
-                  {isLiking ? '...' : likeCount}
+                  {isLiking ? "..." : likeCount}
                 </span>
               </button>
 
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-green-500 hover:bg-blue-50 transition-all duration-200"
               >
                 <MessageCircle className="w-5 h-5" />
                 <span className="text-sm font-medium">{comments.length}</span>
@@ -234,12 +245,14 @@ export default function PostCard({ post }) {
             <button
               onClick={() => setBookmarked(!bookmarked)}
               className={`p-2 rounded-lg transition-all duration-200 ${
-                bookmarked 
-                  ? 'text-yellow-600 bg-yellow-50' 
-                  : 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-50'
+                bookmarked
+                  ? "text-yellow-600 bg-yellow-50"
+                  : "text-gray-600 hover:text-yellow-600 hover:bg-yellow-50"
               }`}
             >
-              <Bookmark className={`w-5 h-5 ${bookmarked ? 'fill-current' : ''}`} />
+              <Bookmark
+                className={`w-5 h-5 ${bookmarked ? "fill-current" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -251,9 +264,14 @@ export default function PostCard({ post }) {
             <div className="space-y-3 mt-4">
               {comments.length > 0 ? (
                 comments.map((comment) => (
-                  <div key={comment._id || comment.author._id} className="flex gap-3">
+                  <div
+                    key={comment._id || comment.author._id}
+                    className="flex gap-3"
+                  >
                     <img
-                      src={comment.author.profilePicture || "/default-profile.png"}
+                      src={
+                        comment.author.profilePicture || "/default-profile.png"
+                      }
                       alt={comment.author.fullname}
                       className="w-8 h-8 rounded-full object-cover"
                     />
@@ -273,7 +291,9 @@ export default function PostCard({ post }) {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-sm text-center py-2">No comments yet</p>
+                <p className="text-gray-500 text-sm text-center py-2">
+                  No comments yet
+                </p>
               )}
             </div>
 
@@ -290,15 +310,15 @@ export default function PostCard({ post }) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write a comment..."
-                  className="w-full px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-all"
+                  className="w-full px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-all"
                 />
                 {newComment && (
                   <button
                     type="submit"
                     disabled={isCommenting}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-700 font-medium text-sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-green-600 hover:text-green-700 font-medium text-sm"
                   >
-                    {isCommenting ? 'Posting...' : 'Send'}
+                    {isCommenting ? "Posting..." : "Send"}
                   </button>
                 )}
               </div>
@@ -309,3 +329,4 @@ export default function PostCard({ post }) {
     </div>
   );
 }
+

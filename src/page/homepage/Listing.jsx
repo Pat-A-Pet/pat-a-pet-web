@@ -98,11 +98,7 @@ export default function Listing() {
   }, [currentPage]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <HamsterLoader size={14} />
-      </div>
-    );
+    return <HamsterLoader size={14} />;
   }
 
   if (error) {
@@ -140,7 +136,7 @@ export default function Listing() {
           }}
         />
         <div className="absolute inset-0  bg-opacity-30 flex items-center justify-end pr-4 md:pr-12 lg:pr-24">
-          <div className="px-8 max-w-xl text-white">
+          <div className="px-8 max-w-xl text-black">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               One More Friend
             </h1>
