@@ -59,7 +59,7 @@ export default function PostCard({ post }) {
       };
 
       await axios.post(
-        `http://localhost:5000/api/posts/post-love/${post._id}`,
+        `https://pat-a-pet-backend.vercel.app/api/posts/post-love/${post._id}`,
         {},
         { headers },
       );
@@ -90,7 +90,7 @@ export default function PostCard({ post }) {
       };
 
       const response = await axios.post(
-        `http://localhost:5000/api/posts/post-comments/${post._id}`,
+        `https://pat-a-pet-backend.vercel.app/api/posts/post-comments/${post._id}`,
         { comment: newComment },
         { headers },
       );

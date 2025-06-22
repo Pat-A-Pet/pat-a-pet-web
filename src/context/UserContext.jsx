@@ -19,7 +19,7 @@ const UserProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/profile", {
+      const res = await fetch("https://pat-a-pet-backend.vercel.app/api/auth/profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

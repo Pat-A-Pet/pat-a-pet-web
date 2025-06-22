@@ -128,7 +128,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `http://localhost:5000/api/pets/get-loved-pets/${userId}`,
+          `https://pat-a-pet-backend.vercel.app/api/pets/get-loved-pets/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -160,7 +160,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `http://localhost:5000/api/posts/get-my-posts/${userId}`,
+          `https://pat-a-pet-backend.vercel.app/api/posts/get-my-posts/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -193,7 +193,7 @@ const MyHub = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:5000/api/pets/my-adoptions/${userId}`,
+          `https://pat-a-pet-backend.vercel.app/api/pets/my-adoptions/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -227,7 +227,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `http://localhost:5000/api/pets/get-all-adoptions-buyer/${userId}`,
+          `https://pat-a-pet-backend.vercel.app/api/pets/get-all-adoptions-buyer/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -258,7 +258,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `http://localhost:5000/api/pets/get-adoption-requests-for-owner/${userId}`,
+          `https://pat-a-pet-backend.vercel.app/api/pets/get-adoption-requests-for-owner/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -285,7 +285,7 @@ const MyHub = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/posts/delete-post/${postId}`,
+        `https://pat-a-pet-backend.vercel.app/api/posts/delete-post/${postId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -309,7 +309,7 @@ const MyHub = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/pets/delete-listing/${postId}`,
+        `https://pat-a-pet-backend.vercel.app/api/pets/delete-listing/${postId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -335,7 +335,7 @@ const MyHub = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/pets/cancel-request-adoption/${petId}`,
+        `https://pat-a-pet-backend.vercel.app/api/pets/cancel-request-adoption/${petId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -370,7 +370,7 @@ const MyHub = () => {
 
     try {
       await axios.patch(
-        `http://localhost:5000/api/pets/update-request-status/${petId}/${requestId}`,
+        `https://pat-a-pet-backend.vercel.app/api/pets/update-request-status/${petId}/${requestId}`,
         { action },
         {
           headers: {

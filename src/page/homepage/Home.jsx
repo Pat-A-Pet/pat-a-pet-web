@@ -36,14 +36,14 @@ export default function Home() {
         
         // Fetch pets with auth headers
         const petsResponse = await axios.get(
-          "http://localhost:5000/api/pets/get-listings",
+          "https://pat-a-pet-backend.vercel.app/api/pets/get-listings",
           { headers }
         );
         setPets(petsResponse.data);
         
         // Fetch adoption stats/posts
         const postResponse = await axios.get(
-          "http://localhost:5000/api/posts/get-posts",
+          "https://pat-a-pet-backend.vercel.app/api/posts/get-posts",
           { headers }
         );
         setPosts(postResponse.data);

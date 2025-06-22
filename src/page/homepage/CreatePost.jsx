@@ -144,7 +144,7 @@ export default function CreatePostPage() {
       });
 
       const response = await axios.post(
-        "http://localhost:5000/api/posts/create-post",
+        "https://pat-a-pet-backend.vercel.app/api/posts/create-post",
         formData,
         {
           headers: {

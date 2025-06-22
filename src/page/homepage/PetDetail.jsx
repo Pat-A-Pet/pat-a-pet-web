@@ -26,7 +26,7 @@ export default function PetDetail() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/pets/get-listing/${id}`,
+          `https://pat-a-pet-backend.vercel.app/api/pets/get-listing/${id}`,
         );
 
         // Handle both response formats
@@ -66,7 +66,7 @@ export default function PetDetail() {
 
       // Make the adoption request
       const response = await axios.post(
-        `http://localhost:5000/api/pets/request-adoption/${id}`,
+        `https://pat-a-pet-backend.vercel.app/api/pets/request-adoption/${id}`,
         { userId: user.id },
         {
           headers: {
@@ -119,7 +119,7 @@ export default function PetDetail() {
       console.log("Sending payload to create-channel:", payload); // For debugging: see what's being sent
 
       const response = await axios.post(
-        "http://localhost:5000/api/chat/create-channel",
+        "https://pat-a-pet-backend.vercel.app/api/chat/create-channel",
         payload,
         {
           headers: {

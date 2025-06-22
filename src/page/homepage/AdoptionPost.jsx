@@ -119,7 +119,7 @@ const CreateAdoption = () => {
       });
 
       const response = await axios.post(
-        "http://localhost:5000/api/pets/upload-pet-images",
+        "https://pat-a-pet-backend.vercel.app/api/pets/upload-pet-images",
         formDataForUpload,
         {
           headers: {
@@ -160,7 +160,7 @@ const CreateAdoption = () => {
       };
 
       await axios.post(
-        "http://localhost:5000/api/pets/create-listing",
+        "https://pat-a-pet-backend.vercel.app/api/pets/create-listing",
         payload,
         {
           headers: {

@@ -20,7 +20,7 @@ export default function SignIn() {
     try {
       // 1. Sign in to your backend
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signin",
+        "https://pat-a-pet-backend.vercel.app/api/auth/signin",
         {
           email,
           password,
@@ -36,7 +36,7 @@ export default function SignIn() {
       // 3. Connect to Stream Chat
       const chatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
       const tokenResponse = await axios.post(
-        "http://localhost:5000/api/chat/chatToken",
+        "https://pat-a-pet-backend.vercel.app/api/chat/chatToken",
         { userId: response.data.user._id }, // Assuming your backend returns userId in the signin response
         { headers: { Authorization: `Bearer ${token}` } },
       );

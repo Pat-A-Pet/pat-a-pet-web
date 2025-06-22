@@ -66,7 +66,7 @@ const EditAdoption = () => {
           : {};
 
         const response = await axios.get(
-          `http://localhost:5000/api/pets/get-listing/${id}`,
+          `https://pat-a-pet-backend.vercel.app/api/pets/get-listing/${id}`,
           { headers },
         );
 
@@ -189,7 +189,7 @@ const EditAdoption = () => {
 
       // Upload images with auth headers
       const response = await axios.post(
-        "http://localhost:5000/api/pets/upload-pet-images",
+        "https://pat-a-pet-backend.vercel.app/api/pets/upload-pet-images",
         formDataForUpload,
         {
           headers: {
@@ -233,7 +233,7 @@ const EditAdoption = () => {
 
       // Update listing with authorization
       await axios.put(
-        `http://localhost:5000/api/pets/update-listing/${id}`,
+        `https://pat-a-pet-backend.vercel.app/api/pets/update-listing/${id}`,
         payload,
         {
           headers: {
@@ -276,7 +276,7 @@ const EditAdoption = () => {
     try {
       setIsUploading(true);
       await axios.delete(
-        `http://localhost:5000/api/pets/delete-listing/${id}`, // Use the route param id
+        `https://pat-a-pet-backend.vercel.app/api/pets/delete-listing/${id}`, // Use the route param id
         {
           headers: {
             Authorization: `Bearer ${user.token}`,

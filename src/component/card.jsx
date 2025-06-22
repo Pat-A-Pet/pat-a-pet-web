@@ -58,7 +58,7 @@ export default function Card({ pet }) {
       }
 
       const { data } = await axios.patch(
-        `http://localhost:5000/api/pets/pet-love/${displayPet._id}`,
+        `https://pat-a-pet-backend.vercel.app/api/pets/pet-love/${displayPet._id}`,
         {},
         {
           headers: {

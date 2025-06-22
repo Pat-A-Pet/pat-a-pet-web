@@ -42,7 +42,7 @@ export default function Listing() {
 
         // Fetch categories first
         const categoriesResponse = await axios.get(
-          "http://localhost:5000/api/pets/categories",
+          "https://pat-a-pet-backend.vercel.app/api/pets/categories",
           { headers },
         );
 
@@ -52,7 +52,7 @@ export default function Listing() {
 
         // Then fetch pets
         const petsResponse = await axios.get(
-          "http://localhost:5000/api/pets/get-listings",
+          "https://pat-a-pet-backend.vercel.app/api/pets/get-listings",
           { headers },
         );
         setPets(petsResponse.data);

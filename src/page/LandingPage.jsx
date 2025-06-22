@@ -36,8 +36,8 @@ export default function Home() {
 
         // Fetch pets and posts in parallel
         const [petsResponse, postsResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/pets/get-listings", { headers }),
-          axios.get("http://localhost:5000/api/posts/get-posts", { headers }),
+          axios.get("https://pat-a-pet-backend.vercel.app/api/pets/get-listings", { headers }),
+          axios.get("https://pat-a-pet-backend.vercel.app/api/posts/get-posts", { headers }),
         ]);
 
         setPets(petsResponse.data.slice(0, 4));

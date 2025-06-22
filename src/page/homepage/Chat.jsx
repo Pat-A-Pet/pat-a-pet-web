@@ -110,7 +110,7 @@ const ChatPage = () => {
 
         // Get Stream Chat token from your backend
         const tokenResponse = await axios.post(
-          "http://localhost:5000/api/chat/chatToken",
+          "https://pat-a-pet-backend.vercel.app/api/chat/chatToken",
           { userId: user.id },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -304,7 +304,7 @@ const ChatPage = () => {
   const createNewChannel = async (petId, otherUserId) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/chat/create-channel",
+        "https://pat-a-pet-backend.vercel.app/api/chat/create-channel",
         { petId, requesterId: user.id, ownerId: otherUserId },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

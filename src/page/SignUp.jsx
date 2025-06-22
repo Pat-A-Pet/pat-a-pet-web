@@ -34,7 +34,7 @@ export default function SignUp() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        "https://pat-a-pet-backend.vercel.app/api/auth/signup",
         payload,
       );
       const { token, user } = response.data;

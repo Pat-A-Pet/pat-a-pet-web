@@ -25,7 +25,7 @@ export default function Community() {
           ? { Authorization: `Bearer ${user.token}` }
           : {};
         const { data } = await axios.get(
-          "http://localhost:5000/api/posts/get-posts",
+          "https://pat-a-pet-backend.vercel.app/api/posts/get-posts",
           { headers },
         );
         setPosts(data);
