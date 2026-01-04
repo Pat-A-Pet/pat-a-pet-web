@@ -85,7 +85,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-gray-300 transition duration-200"
+                  className="cursor-default hover:text-gray-300 transition duration-200"
                 >
                   Blog
                 </a>
@@ -93,7 +93,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-gray-300 transition duration-200"
+                  className="cursor-default hover:text-gray-300 transition duration-200"
                 >
                   Pet Care Guides
                 </a>
@@ -101,7 +101,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-gray-300 transition duration-200"
+                  className="cursor-default hover:text-gray-300 transition duration-200"
                 >
                   Training Tips
                 </a>
@@ -109,7 +109,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-gray-300 transition duration-200"
+                  className="cursor-default hover:text-gray-300 transition duration-200"
                 >
                   Vet Finder
                 </a>
@@ -122,7 +122,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="text-gray-400 hover:text-gray-300 transition duration-200"
+                className="cursor-default text-gray-400 hover:text-gray-300 transition duration-200"
               >
                 <svg
                   className="h-6 w-6"
@@ -134,7 +134,7 @@ const Footer = () => {
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-gray-300 transition duration-200"
+                className="cursor-default text-gray-400 hover:text-gray-300 transition duration-200"
               >
                 <svg
                   className="h-6 w-6"
@@ -146,7 +146,7 @@ const Footer = () => {
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-gray-300 transition duration-200"
+                className="cursor-default text-gray-400 hover:text-gray-300 transition duration-200"
               >
                 <svg
                   className="h-6 w-6"
@@ -177,13 +177,22 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-10 pt-6 text-center text-gray-400">
           <p>© {currentYear} Pet-A-Pet. All rights reserved.</p>
           <div className="mt-2 flex justify-center space-x-6 text-sm">
-            <a href="#" className="hover:text-gray-300 transition">
+            <a
+              href="#"
+              className="cursor-default hover:text-gray-300 transition"
+            >
               Privacy Policy
             </a>
-            <a href="#" className="hover:text-gray-300 transition">
+            <a
+              href="#"
+              className="cursor-default hover:text-gray-300 transition"
+            >
               Terms of Service
             </a>
-            <a href="#" className="hover:text-gray-300 transition">
+            <a
+              href="#"
+              className="cursor-default hover:text-gray-300 transition"
+            >
               Cookie Policy
             </a>
           </div>

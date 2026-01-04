@@ -18,6 +18,7 @@ export default function Listing() {
   const [error, setError] = useState(null);
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const cardsPerPage = 9;
 
@@ -42,7 +43,7 @@ export default function Listing() {
 
         // Fetch categories first
         const categoriesResponse = await axios.get(
-          "https://pat-a-pet-backend.vercel.app/api/pets/categories",
+          `${baseUrl}/pets/categories`,
           { headers },
         );
 
@@ -51,10 +52,9 @@ export default function Listing() {
         setCategories(fetchedCategories);
 
         // Then fetch pets
-        const petsResponse = await axios.get(
-          "https://pat-a-pet-backend.vercel.app/api/pets/get-listings",
-          { headers },
-        );
+        const petsResponse = await axios.get(`${baseUrl}/pets/get-listings`, {
+          headers,
+        });
         setPets(petsResponse.data);
         setError(null);
       } catch (err) {
@@ -98,7 +98,8 @@ export default function Listing() {
   }, [currentPage]);
 
   if (loading) {
-    return <HamsterLoader size={14} />;
+    // return <HamsterLoader size={14} />;
+    return <div>{/* <HamsterLoader size={14} /> */}</div>;
   }
 
   if (error) {
@@ -148,7 +149,7 @@ export default function Listing() {
               who will always be with you to have fun. We have {pets.length}+
               different pets that can meet your needs!
             </p>
-            <button className="bg-white hover:bg-green-700 hover:text-white text-gray-800 px-8 py-3 rounded-full text-sm font-semibold transition-all duration-300 shadow-md">
+            <button className="bg-white hover:bg-green-700 hover:text-white text-gray-800 px-8 py-3 rounded-full text-sm font-semibold transition-all duration-300 shadow-md cursor-pointer">
               Explore Now
             </button>
           </div>

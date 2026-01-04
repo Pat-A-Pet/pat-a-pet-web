@@ -44,6 +44,7 @@ const MyHub = () => {
 
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   // Animation variants
   const tabVariants = {
@@ -128,7 +129,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/pets/get-loved-pets/${userId}`,
+          `${baseUrl}/pets/get-loved-pets/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -160,7 +161,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/posts/get-my-posts/${userId}`,
+          `${baseUrl}/posts/get-my-posts/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -193,7 +194,7 @@ const MyHub = () => {
         }
 
         const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/pets/my-adoptions/${userId}`,
+          `${baseUrl}/pets/my-adoptions/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -227,7 +228,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/pets/get-all-adoptions-buyer/${userId}`,
+          `${baseUrl}/pets/get-all-adoptions-buyer/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -258,7 +259,7 @@ const MyHub = () => {
         if (!userId) return;
 
         const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/pets/get-adoption-requests-for-owner/${userId}`,
+          `${baseUrl}/pets/get-adoption-requests-for-owner/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -284,15 +285,12 @@ const MyHub = () => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
 
     try {
-      await axios.delete(
-        `https://pat-a-pet-backend.vercel.app/api/posts/delete-post/${postId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
+      await axios.delete(`${baseUrl}/posts/delete-post/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
-      );
+      });
       setPostsData((prev) => prev.filter((post) => post._id !== postId));
     } catch (error) {
       console.error(
@@ -308,15 +306,12 @@ const MyHub = () => {
       return;
 
     try {
-      await axios.delete(
-        `https://pat-a-pet-backend.vercel.app/api/pets/delete-listing/${postId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
+      await axios.delete(`${baseUrl}/pets/delete-listing/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
-      );
+      });
       setAdoptionPosts((prev) => prev.filter((post) => post._id !== postId));
     } catch (error) {
       console.error(
@@ -334,16 +329,13 @@ const MyHub = () => {
       return;
 
     try {
-      await axios.delete(
-        `https://pat-a-pet-backend.vercel.app/api/pets/cancel-request-adoption/${petId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-          data: { userId: user?.id },
+      await axios.delete(`${baseUrl}/pets/cancel-request-adoption/${petId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
-      );
+        data: { userId: user?.id },
+      });
 
       // Update state to remove the canceled request
       setBuyerRequests((prev) => ({
@@ -370,7 +362,7 @@ const MyHub = () => {
 
     try {
       await axios.patch(
-        `https://pat-a-pet-backend.vercel.app/api/pets/update-request-status/${petId}/${requestId}`,
+        `${baseUrl}/pets/update-request-status/${petId}/${requestId}`,
         { action },
         {
           headers: {
@@ -573,7 +565,7 @@ const MyHub = () => {
                       activeTab === tab.id
                         ? "text-emerald-600"
                         : "text-gray-500 hover:text-gray-700"
-                    }`}
+                    } cursor-pointer`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -629,7 +621,7 @@ const MyHub = () => {
                   </div>
                   <motion.button
                     onClick={() => navigate("/listing")}
-                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-xl font-medium shadow-md transition-all text-sm sm:text-base"
+                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-xl font-medium shadow-md transition-all text-sm sm:text-base cursor-pointer"
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -721,8 +713,8 @@ const MyHub = () => {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative flex items-center">
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer" />
+                    <div className="cursor-pointer relative flex items-center ">
                       <FaPlus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       New Post
                     </div>
@@ -759,7 +751,7 @@ const MyHub = () => {
                     </p>
                     <motion.button
                       onClick={() => navigate("/createpost")}
-                      className="inline-flex items-center px-6 py-2.5 sm:px-8 sm:py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
+                      className="inline-flex items-center px-6 py-2.5 sm:px-8 sm:py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base cursor-pointer"
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -791,7 +783,7 @@ const MyHub = () => {
                   </h2>
                   <motion.button
                     onClick={() => navigate("/createadopt")}
-                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition text-sm sm:text-base"
+                    className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition text-sm sm:text-base cursor-pointer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -920,7 +912,7 @@ const MyHub = () => {
                                   onClick={() =>
                                     navigate(`/editadopt/${pet._id}`)
                                   }
-                                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-medium transition text-sm"
+                                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-medium transition text-sm cursor-pointer"
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                 >
@@ -928,7 +920,7 @@ const MyHub = () => {
                                 </motion.button>
                                 <motion.button
                                   onClick={() => handleDeleteAdoption(pet._id)}
-                                  className="w-full sm:w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-red-100 text-red-500 rounded-lg transition"
+                                  className="w-full sm:w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-red-100 text-red-500 rounded-lg transition cursor-pointer"
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                 >
@@ -1084,7 +1076,7 @@ const MyHub = () => {
                                 {pet.userRequest?.status === "pending" && (
                                   <motion.button
                                     onClick={() => handleCancelRequest(pet._id)}
-                                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition text-sm"
+                                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition text-sm cursor-pointer"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                   >

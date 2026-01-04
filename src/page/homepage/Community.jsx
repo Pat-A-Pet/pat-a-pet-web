@@ -16,6 +16,7 @@ export default function Community() {
   const cardsPerPage = 6;
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -24,10 +25,9 @@ export default function Community() {
         const headers = user?.token
           ? { Authorization: `Bearer ${user.token}` }
           : {};
-        const { data } = await axios.get(
-          "https://pat-a-pet-backend.vercel.app/api/posts/get-posts",
-          { headers },
-        );
+        const { data } = await axios.get(`${baseUrl}/posts/get-posts`, {
+          headers,
+        });
         setPosts(data);
         setError(null);
       } catch (err) {
@@ -51,7 +51,8 @@ export default function Community() {
   };
 
   if (loading) {
-    return <HamsterLoader size={14} />;
+    // return <HamsterLoader size={14} />;
+    return <div>{/* <HamsterLoader size={14} /> */}</div>;
   }
 
   if (error) {
@@ -95,7 +96,7 @@ export default function Community() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-white text-black hover:bg-emerald-50 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 w-full sm:w-auto"
+              className="bg-white text-black hover:bg-emerald-50 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 w-full sm:w-auto cursor-pointer"
             >
               Share Your Story
             </button>
@@ -105,7 +106,7 @@ export default function Community() {
                   .getElementById("posts-section")
                   .scrollIntoView({ behavior: "smooth" })
               }
-              className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition hover:scale-105 w-full sm:w-auto"
+              className="bg-transparent border-2 border-white text-white hover:bg-white/20 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition hover:scale-105 w-full sm:w-auto cursor-pointer"
             >
               Explore Posts
             </button>
@@ -131,7 +132,7 @@ export default function Community() {
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 rounded-full font-medium transition-all flex items-center justify-center whitespace-nowrap hover:scale-105 w-full sm:w-auto"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 rounded-full font-medium transition-all flex items-center justify-center whitespace-nowrap hover:scale-105 w-full sm:w-auto cursor-pointer"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -284,7 +285,7 @@ export default function Community() {
             features
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            <div className="bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
+            <div className="hover:transition-transform hover:scale-105 bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
               <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
                   className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600"
@@ -307,7 +308,7 @@ export default function Community() {
                 Get advice from experienced pet owners
               </p>
             </div>
-            <div className="bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
+            <div className="hover:transition-transform hover:scale-105 bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
               <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
                   className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600"
@@ -330,7 +331,7 @@ export default function Community() {
                 Show off your adorable pets
               </p>
             </div>
-            <div className="bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
+            <div className="hover:transition-transform hover:scale-105 bg-white/10 p-4 sm:p-6 rounded-xl backdrop-blur-sm">
               <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
                   className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600"
@@ -357,7 +358,7 @@ export default function Community() {
           <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <button
               onClick={() => navigate("/createpost")}
-              className="bg-white text-emerald-600 hover:bg-emerald-50 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm sm:text-base"
+              className="bg-white text-emerald-600 hover:bg-emerald-50 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm sm:text-base cursor-pointer"
             >
               Create Your First Post
             </button>

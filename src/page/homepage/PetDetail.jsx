@@ -6,7 +6,7 @@ import { FiClock, FiMapPin, FiHeart } from "react-icons/fi";
 import axios from "axios";
 import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
-import HamsterLoader from "../../component/Loader";
+// import HamsterLoader from "../../component/Loader";
 import { useNavigate } from "react-router-dom";
 
 export default function PetDetail() {
@@ -20,14 +20,13 @@ export default function PetDetail() {
   const [petData, setPetData] = useState(null);
   const navigate = useNavigate();
   const [isCreatingChannel, setIsCreatingChannel] = useState(false);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchPetData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/pets/get-listing/${id}`,
-        );
+        const response = await axios.get(`${baseUrl}/pets/get-listing/${id}`);
 
         // Handle both response formats
         const petData = response.data.pet || response.data;
@@ -66,7 +65,7 @@ export default function PetDetail() {
 
       // Make the adoption request
       const response = await axios.post(
-        `https://pat-a-pet-backend.vercel.app/api/pets/request-adoption/${id}`,
+        `${baseUrl}/pets/request-adoption/${id}`,
         { userId: user.id },
         {
           headers: {
@@ -119,7 +118,7 @@ export default function PetDetail() {
       console.log("Sending payload to create-channel:", payload); // For debugging: see what's being sent
 
       const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/chat/create-channel",
+        `${baseUrl}/chat/create-channel`,
         payload,
         {
           headers: {
@@ -158,11 +157,7 @@ export default function PetDetail() {
   };
 
   if (loading) {
-    return (
-      <div>
-        <HamsterLoader size={14} />
-      </div>
-    );
+    return <div>{/* <HamsterLoader size={14} /> */}</div>;
   }
 
   if (error) {

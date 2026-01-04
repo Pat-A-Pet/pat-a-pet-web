@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+// import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
@@ -37,6 +37,7 @@ export default function CreatePostPage() {
   const MAX_CHARS = 500;
   const remainingChars = MAX_CHARS - content.length;
   const { user } = useContext(UserContext);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     // Clean up object URLs when component unmounts
@@ -144,7 +145,7 @@ export default function CreatePostPage() {
       });
 
       const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/posts/create-post",
+        `${baseUrl}/posts/create-post`,
         formData,
         {
           headers: {
@@ -561,4 +562,3 @@ export default function CreatePostPage() {
     </div>
   );
 }
-

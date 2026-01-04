@@ -14,18 +14,16 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const { fetchUser } = useContext(UserContext);
   const STREAM_CHAT_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       // 1. Sign in to your backend
-      const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/auth/signin",
-        {
-          email,
-          password,
-        },
-      );
+      const response = await axios.post(`${baseUrl}/auth/signin`, {
+        email,
+        password,
+      });
 
       const { token } = response.data;
       localStorage.setItem("token", token);
@@ -36,7 +34,7 @@ export default function SignIn() {
       // 3. Connect to Stream Chat
       const chatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
       const tokenResponse = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/chat/chatToken",
+        `${baseUrl}/chat/chatToken`,
         { userId: response.data.user._id }, // Assuming your backend returns userId in the signin response
         { headers: { Authorization: `Bearer ${token}` } },
       );

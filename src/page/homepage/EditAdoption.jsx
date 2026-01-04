@@ -30,6 +30,7 @@ const EditAdoption = () => {
   const [originalData, setOriginalData] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const MAX_STEPS = 3;
   const progressPercentage = (step / MAX_STEPS) * 100;
@@ -65,10 +66,9 @@ const EditAdoption = () => {
           ? { Authorization: `Bearer ${user.token}` }
           : {};
 
-        const response = await axios.get(
-          `https://pat-a-pet-backend.vercel.app/api/pets/get-listing/${id}`,
-          { headers },
-        );
+        const response = await axios.get(`${baseUrl}/pets/get-listing/${id}`, {
+          headers,
+        });
 
         const petData = response.data.pet;
         setOriginalData({
@@ -189,7 +189,7 @@ const EditAdoption = () => {
 
       // Upload images with auth headers
       const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/pets/upload-pet-images",
+        `${baseUrl}/pets/upload-pet-images`,
         formDataForUpload,
         {
           headers: {
@@ -232,15 +232,11 @@ const EditAdoption = () => {
       };
 
       // Update listing with authorization
-      await axios.put(
-        `https://pat-a-pet-backend.vercel.app/api/pets/update-listing/${id}`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
+      await axios.put(`${baseUrl}/pets/update-listing/${id}`, payload, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
         },
-      );
+      });
     } catch (err) {
       console.error("Listing update error:", err);
       throw new Error(err.response?.data?.error || "Failed to update listing");
@@ -276,7 +272,7 @@ const EditAdoption = () => {
     try {
       setIsUploading(true);
       await axios.delete(
-        `https://pat-a-pet-backend.vercel.app/api/pets/delete-listing/${id}`, // Use the route param id
+        `${baseUrl}/pets/delete-listing/${id}`, // Use the route param id
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -1084,4 +1080,3 @@ const EditAdoption = () => {
 };
 
 export default EditAdoption;
-

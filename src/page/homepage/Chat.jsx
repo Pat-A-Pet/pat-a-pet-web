@@ -27,6 +27,7 @@ const ChatPage = () => {
   const { user, loading: userLoading } = useContext(UserContext);
   const { channelId } = useParams();
   const navigate = useNavigate();
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const [streamClient, setStreamClient] = useState(null);
   const [activeChannel, setActiveChannel] = useState(null);
@@ -110,7 +111,7 @@ const ChatPage = () => {
 
         // Get Stream Chat token from your backend
         const tokenResponse = await axios.post(
-          "https://pat-a-pet-backend.vercel.app/api/chat/chatToken",
+          `${baseUrl}/chat/chatToken`,
           { userId: user.id },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -304,7 +305,7 @@ const ChatPage = () => {
   const createNewChannel = async (petId, otherUserId) => {
     try {
       const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/chat/create-channel",
+        `${baseUrl}/chat/create-channel`,
         { petId, requesterId: user.id, ownerId: otherUserId },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -372,7 +373,7 @@ const ChatPage = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 mt-16">
+      <div className="h-max bg-gradient-to-br from-emerald-50 via-white to-green-50 mt-16">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row h-[calc(100vh-80px)]">
           {/* Sidebar - Conversation List */}
           <div

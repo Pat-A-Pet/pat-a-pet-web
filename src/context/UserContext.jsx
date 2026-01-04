@@ -7,6 +7,7 @@ const UserContext = createContext(null);
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
@@ -19,7 +20,7 @@ const UserProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch("https://pat-a-pet-backend.vercel.app/api/auth/profile", {
+      const res = await fetch(`${baseUrl}/auth/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

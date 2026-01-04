@@ -26,6 +26,7 @@ const CreateAdoption = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const MAX_STEPS = 3;
   const progressPercentage = (step / MAX_STEPS) * 100;
@@ -119,7 +120,7 @@ const CreateAdoption = () => {
       });
 
       const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/pets/upload-pet-images",
+        `${baseUrl}/pets/upload-pet-images`,
         formDataForUpload,
         {
           headers: {
@@ -159,15 +160,11 @@ const CreateAdoption = () => {
         species: formData.species,
       };
 
-      await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/pets/create-listing",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
+      await axios.post(`${baseUrl}/pets/create-listing`, payload, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
         },
-      );
+      });
     } catch (err) {
       console.error("Listing creation error:", err);
       throw new Error(err.response?.data?.error || "Failed to create listing");

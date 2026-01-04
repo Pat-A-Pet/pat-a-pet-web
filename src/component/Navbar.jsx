@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Crown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../handler/AuthHandler";
 import { UserContext } from "../context/UserContext";
@@ -101,14 +101,14 @@ const Navbar = () => {
             return (
               <div
                 key={isAuthenticated ? link.path : link.id}
-                className="relative"
+                className="relative w-max"
               >
                 {isAuthenticated ? (
                   <Link
                     to={link.path}
                     className={`nav-link relative z-10 px-1 py-2 text-sm sm:text-base ${
                       isActive ? "text-black font-medium" : "text-black"
-                    } cursor-pointer`}
+                    } cursor-pointer transition-transform duration-200 hover:scale-10`}
                   >
                     {link.label}
                   </Link>
@@ -117,7 +117,7 @@ const Navbar = () => {
                     onClick={() => scrollTo(link.id)}
                     className={`nav-link relative z-10 px-1 py-2 text-sm sm:text-base ${
                       isActive ? "text-white font-medium" : "text-black"
-                    } cursor-pointer`}
+                    } cursor-pointer transition-transform duration-200 hover:scale-10 `}
                   >
                     {link.label}
                   </button>
@@ -126,7 +126,7 @@ const Navbar = () => {
                 {isActive && (
                   <motion.div
                     layoutId="active-indicator"
-                    className="absolute bottom-0 left-0 right-0 h-1 bg-[#A0C878] rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-1 bg-[#A0C878] rounded-t-full transition-transform duration-200 hover:scale-10"
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   />
                 )}
@@ -153,15 +153,31 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <div className="relative" ref={profileRef}>
+            <div className="flex items-center gap-4" ref={profileRef}>
               <motion.button
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 2,
+                  ease: "easeInOut",
+                }}
                 whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="bg-indigo-100 p-2 rounded-full cursor-pointer"
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer bg-[#A0C878] text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-[#8eb866] transition-colors"
               >
-                <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+                <Crown size={16} />
+                Get Premium
               </motion.button>
+              <div className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="bg-indigo-100 p-2 rounded-full cursor-pointer"
+                >
+                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+                </motion.button>
+              </div>
 
               <AnimatePresence>
                 {profileDropdownOpen && (
@@ -169,7 +185,7 @@ const Navbar = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl z-50 overflow-hidden"
+                    className="absolute top-16 right-20 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl z-50 overflow-hidden"
                   >
                     <div className="py-1">
                       <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-100">
@@ -256,17 +272,17 @@ const Navbar = () => {
                       {isAuthenticated ? (
                         <Link
                           to={link.path}
-                          className={`flex items-center py-3 px-6 text-sm ${
+                          className={`transition-transform duration-200 hover:scale-10 flex items-center py-3 px-6 text-sm ${
                             isActive
                               ? "text-gray-800 font-medium"
                               : "text-gray-600"
-                          }`}
+                          } `}
                           onClick={() => setMenuOpen(false)}
                         >
                           {isActive && (
                             <motion.div
                               layoutId="mobile-active-indicator"
-                              className="w-1.5 h-1.5 rounded-full bg-[#A0C878] mr-2"
+                              className="w-1.5 h-1.5 rounded-full bg-[#A0C878] mr-2 transition-transform duration-200 hover:scale-10"
                             />
                           )}
                           {link.label}
@@ -274,7 +290,7 @@ const Navbar = () => {
                       ) : (
                         <button
                           onClick={() => scrollTo(link.id)}
-                          className={`flex items-center py-3 px-6 w-full text-left text-sm ${
+                          className={`flex items-center py-3 px-6 w-full text-left text-sm transition-transform duration-200 hover:scale-10 ${
                             isActive
                               ? "text-[#A0C878] font-medium bg-[#A0C878]/10"
                               : "text-gray-600"
@@ -283,7 +299,7 @@ const Navbar = () => {
                           {isActive && (
                             <motion.div
                               layoutId="mobile-active-indicator"
-                              className="w-1.5 h-1.5 rounded-full bg-[#A0C878] mr-2"
+                              className="w-1.5 h-1.5 rounded-full bg-[#A0C878] mr-2 transition-transform duration-200 hover:scale-10"
                             />
                           )}
                           {link.label}

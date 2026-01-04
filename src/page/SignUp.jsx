@@ -11,6 +11,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -33,10 +34,7 @@ export default function SignUp() {
     };
 
     try {
-      const response = await axios.post(
-        "https://pat-a-pet-backend.vercel.app/api/auth/signup",
-        payload,
-      );
+      const response = await axios.post(`${baseUrl}/auth/signup`, payload);
       const { token, user } = response.data;
 
       localStorage.setItem("token", token);
@@ -132,7 +130,7 @@ export default function SignUp() {
 
           <button
             type="submit"
-            className="w-full text-white py-2 rounded-lg font-semibold hover:bg-[#0f6b87] transition"
+            className="w-full text-white py-2 rounded-lg font-semibold hover:bg-[#0f6b87] transition cursor-pointer"
             style={{ backgroundColor: "#A0C878" }}
           >
             Sign Up

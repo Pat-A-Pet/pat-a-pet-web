@@ -4,7 +4,7 @@ import Card from "../component/card";
 import { FiChevronRight } from "react-icons/fi";
 import PostCard from "../component/post";
 import { useNavigate } from "react-router-dom";
-import HamsterLoader from "../component/Loader";
+// import HamsterLoader from "../component/Loader";
 import Footer from "../component/Footer";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
@@ -20,6 +20,7 @@ export default function Home() {
     petsListed: 0,
     adoptions: 0,
   });
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +37,8 @@ export default function Home() {
 
         // Fetch pets and posts in parallel
         const [petsResponse, postsResponse] = await Promise.all([
-          axios.get("https://pat-a-pet-backend.vercel.app/api/pets/get-listings", { headers }),
-          axios.get("https://pat-a-pet-backend.vercel.app/api/posts/get-posts", { headers }),
+          axios.get(`${baseUrl}/pets/get-listings`, { headers }),
+          axios.get(`${baseUrl}/posts/get-posts`, { headers }),
         ]);
 
         setPets(petsResponse.data.slice(0, 4));
@@ -79,7 +80,8 @@ export default function Home() {
   };
 
   if (userLoading || loading) {
-    return <HamsterLoader size={14} />;
+    // return <HamsterLoader size={14} />;
+    return;
   }
 
   if (error) {
@@ -166,7 +168,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-96 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 lg:gap-10 xl:gap-72 justify-items-center">
           {pets.length > 0 ? (
             pets.map((pet) => <Card key={pet._id} pet={pet} />)
           ) : (

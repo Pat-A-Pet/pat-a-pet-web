@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Navbar from "../../component/Navbar";
 import Card from "../../component/card";
 import { FiChevronRight } from "react-icons/fi";
 import PostCard from "../../component/post";
 import { useNavigate } from "react-router-dom";
-import HamsterLoader from "../../component/Loader";
+// import HamsterLoader from "../../component/Loader";
 import Footer from "../../component/Footer";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
@@ -16,6 +16,7 @@ export default function Home() {
   const [error, setError] = useState(null);
   const { user, loading: userLoading } = useContext(UserContext); // Get both user and loading state
   const [posts, setPosts] = useState([]); // Fixed: should be array, not number
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,28 +27,26 @@ export default function Home() {
 
       try {
         setLoading(true);
-        
+
         // Create headers with authorization if user exists
-        const headers = user?.token 
-          ? { Authorization: `Bearer ${user.token}` } 
+        const headers = user?.token
+          ? { Authorization: `Bearer ${user.token}` }
           : {};
 
         console.log("User token:", user?.token);
-        
+
         // Fetch pets with auth headers
-        const petsResponse = await axios.get(
-          "https://pat-a-pet-backend.vercel.app/api/pets/get-listings",
-          { headers }
-        );
+        const petsResponse = await axios.get(`${baseUrl}/pets/get-listings`, {
+          headers,
+        });
         setPets(petsResponse.data);
-        
+
         // Fetch adoption stats/posts
-        const postResponse = await axios.get(
-          "https://pat-a-pet-backend.vercel.app/api/posts/get-posts",
-          { headers }
-        );
+        const postResponse = await axios.get(`${baseUrl}/posts/get-posts`, {
+          headers,
+        });
         setPosts(postResponse.data);
-        
+
         setError(null);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -72,11 +71,7 @@ export default function Home() {
 
   // Show loading while either user context is loading OR data is loading
   if (userLoading || loading) {
-    return (
-      <div>
-        <HamsterLoader size={14} />
-      </div>
-    );
+    return <div>{/* <HamsterLoader size={14} /> */}</div>;
   }
 
   if (error) {
@@ -86,8 +81,8 @@ export default function Home() {
         <div className="flex-grow flex justify-center items-center">
           <div className="text-center">
             <p className="text-red-500 text-lg">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="mt-4 bg-[#A0C878] text-white px-4 py-2 rounded-full"
             >
               Try Again
@@ -118,11 +113,12 @@ export default function Home() {
               Thousands More Fun!
             </h2>
             <p className="text-sm md:text-xm">
-              Having a pet means you have more joy, a new friend, a happy <br /> 
-              person who will always be with you to have fun. We have {pets.length}+ <br /> 
-              different pets that can meet your needs! <br /> 
+              Having a pet means you have more joy, a new friend, a happy <br />
+              person who will always be with you to have fun. We have{" "}
+              {pets.length}+ <br />
+              different pets that can meet your needs! <br />
             </p>
-            <button 
+            <button
               onClick={handleExploreClick}
               className="bg-[#A0C878] hover:bg-green-700 text-white px-9 py-3 rounded-full text-sm font-semibold transition mt-6"
             >
@@ -140,7 +136,7 @@ export default function Home() {
               Take A Look At Some Of Our Pets
             </h2>
           </div>
-          <button 
+          <button
             onClick={() => navigate("/listing")}
             className="flex items-center gap-1 px-4 py-2 border border-[#A0C878] text-[#A0C878] rounded-full text-sm hover:bg-[#A0C878] hover:text-white transition"
           >
@@ -151,12 +147,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center mt-8">
           {pets.length > 0 ? (
-            pets.slice(0, 4).map((pet) => (
-              <Card 
-                key={pet._id} 
-                pet={pet}
-              />
-            ))
+            pets.slice(0, 4).map((pet) => <Card key={pet._id} pet={pet} />)
           ) : (
             <div className="col-span-4 text-center py-8">
               <p className="text-gray-500">No pets available at the moment</p>
@@ -182,7 +173,7 @@ export default function Home() {
             <h2 className="text-4xm md:text-3xl font-semibold mb-4">
               🐾 {posts.length} Adoptions!
             </h2>
-            <button 
+            <button
               onClick={handleExploreClick}
               className="bg-[#A0C878] hover:bg-green-700 text-white px-9 py-3 rounded-full text-sm font-semibold transition mt-6"
             >
@@ -195,12 +186,12 @@ export default function Home() {
       <main className="pt-12 px-6">
         <div className="flex justify-between items-center mb-2">
           <div>
-            <p className="text-lg mb-1">Hard to choose right products for your pets?</p>
-            <h2 className="text-3xl font-bold text-gray-600">
-              Our Community
-            </h2>
+            <p className="text-lg mb-1">
+              Hard to choose right products for your pets?
+            </p>
+            <h2 className="text-3xl font-bold text-gray-600">Our Community</h2>
           </div>
-          <button 
+          <button
             onClick={() => {
               if (!user) {
                 alert("Please login to view community");
@@ -217,9 +208,10 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-center mt-8 items-start mb-16">
-          {posts.length > 0 && posts.slice(0, 3).map((post) => (
-              <PostCard key={post._id} post={post} />
-           ))}
+          {posts.length > 0 &&
+            posts
+              .slice(0, 3)
+              .map((post) => <PostCard key={post._id} post={post} />)}
         </div>
       </main>
       <Footer />

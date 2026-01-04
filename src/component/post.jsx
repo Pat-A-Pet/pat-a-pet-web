@@ -22,6 +22,7 @@ export default function PostCard({ post }) {
   const [likeCount, setLikeCount] = useState(post?.loves?.length || 0);
   const [isLiking, setIsLiking] = useState(false);
   const [isCommenting, setIsCommenting] = useState(false);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   // Use post images if available, otherwise default images
   const postImages =
@@ -59,7 +60,7 @@ export default function PostCard({ post }) {
       };
 
       await axios.post(
-        `https://pat-a-pet-backend.vercel.app/api/posts/post-love/${post._id}`,
+        `${baseUrl}/posts/post-love/${post._id}`,
         {},
         { headers },
       );
@@ -90,7 +91,7 @@ export default function PostCard({ post }) {
       };
 
       const response = await axios.post(
-        `https://pat-a-pet-backend.vercel.app/api/posts/post-comments/${post._id}`,
+        `${baseUrl}/posts/post-comments/${post._id}`,
         { comment: newComment },
         { headers },
       );
@@ -127,7 +128,7 @@ export default function PostCard({ post }) {
     <div className="w-full p-[2px] bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 rounded-[24px] shadow-[0_8px_30px_rgba(34,197,94,0.12)] hover:shadow-[0_12px_40px_rgba(34,197,94,0.20)] transition-all duration-300">
       <div className="bg-white rounded-[22px] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100 cursor-default">
           <div className="flex items-center gap-3">
             <div className="relative">
               <img
@@ -218,7 +219,7 @@ export default function PostCard({ post }) {
                   liked
                     ? "text-red-500 bg-red-50 hover:bg-red-100"
                     : "text-gray-600 hover:text-red-500 hover:bg-red-50"
-                }`}
+                } cursor-pointer`}
               >
                 <Heart
                   className={`w-5 h-5 transition-all duration-200 ${liked ? "fill-current scale-110" : ""}`}
@@ -230,7 +231,7 @@ export default function PostCard({ post }) {
 
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-green-500 hover:bg-blue-50 transition-all duration-200"
+                className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-green-500 hover:bg-blue-50 transition-all duration-200"
               >
                 <MessageCircle className="w-5 h-5" />
                 <span className="text-sm font-medium">{comments.length}</span>
@@ -248,7 +249,7 @@ export default function PostCard({ post }) {
                 bookmarked
                   ? "text-yellow-600 bg-yellow-50"
                   : "text-gray-600 hover:text-yellow-600 hover:bg-yellow-50"
-              }`}
+              } cursor-pointer`}
             >
               <Bookmark
                 className={`w-5 h-5 ${bookmarked ? "fill-current" : ""}`}

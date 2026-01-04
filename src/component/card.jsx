@@ -19,6 +19,7 @@ export default function Card({ pet }) {
     }
   });
   const [saving, setSaving] = useState(false);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   // Default data if no pet is provided
   const defaultPet = {
@@ -58,7 +59,7 @@ export default function Card({ pet }) {
       }
 
       const { data } = await axios.patch(
-        `https://pat-a-pet-backend.vercel.app/api/pets/pet-love/${displayPet._id}`,
+        `${baseUrl}/pets/pet-love/${displayPet._id}`,
         {},
         {
           headers: {
@@ -88,7 +89,7 @@ export default function Card({ pet }) {
     <div
       className={`w-[320px] h-[320px] bg-white rounded-[32px] p-[3px] relative shadow-[0_70px_30px_-50px_#604b4a30] transition-all duration-500 ease-in-out border-4 border-green-500 ${
         hover ? "rounded-tl-[55px]" : ""
-      }`}
+      } cursor-pointer`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onClick={() => navigate(`/petdetail/${displayPet._id}`)}
@@ -102,7 +103,7 @@ export default function Card({ pet }) {
             displayPet._id === "default" || !user
               ? "opacity-50 cursor-not-allowed"
               : ""
-          }`}
+          } cursor-pointer`}
           aria-label={liked ? "Remove from favorites" : "Add to favorites"}
         >
           {liked ? (
@@ -190,7 +191,7 @@ export default function Card({ pet }) {
                 hover
                   ? "bg-yellow-200 text-green-800 transform scale-105 shadow-xl hover:shadow-2xl"
                   : "hover:bg-green-50 hover:scale-105"
-              }`}
+              } cursor-pointer`}
             >
               Adopt
             </button>
@@ -212,4 +213,3 @@ export default function Card({ pet }) {
     </div>
   );
 }
-
