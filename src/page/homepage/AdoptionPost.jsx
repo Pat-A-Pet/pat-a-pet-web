@@ -12,12 +12,14 @@ import {
   FiX,
   FiCheck,
 } from "react-icons/fi";
+import { Video } from "lucide-react";
 import { FaDog, FaCat } from "react-icons/fa";
 import { GiFishScales, GiPig, GiRat, GiTortoise } from "react-icons/gi";
 import Navbar from "../../component/Navbar";
 import Footer from "../../component/Footer";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
+import PremiumModal from "../../component/PremiumModal";
 
 const CreateAdoption = () => {
   const { user } = useContext(UserContext);
@@ -30,6 +32,8 @@ const CreateAdoption = () => {
 
   const MAX_STEPS = 3;
   const progressPercentage = (step / MAX_STEPS) * 100;
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [premiumFeatureSource, setPremiumFeatureSource] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,6 +55,11 @@ const CreateAdoption = () => {
     images: [],
     files: [],
   });
+
+  const openPremium = (source) => {
+    setPremiumFeatureSource(source);
+    setIsPremiumModalOpen(true);
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -222,6 +231,11 @@ const CreateAdoption = () => {
 
   return (
     <>
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
+        featureSource={premiumFeatureSource}
+      />
       <Navbar />
 
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white mt-16">
@@ -229,7 +243,7 @@ const CreateAdoption = () => {
           <div className="mb-8">
             <button
               onClick={() => window.history.back()}
-              className="flex items-center text-emerald-600 hover:text-emerald-800 font-medium mb-4"
+              className="flex items-center text-emerald-600 hover:text-emerald-800 font-medium mb-4 cursor-pointer"
             >
               <FiArrowLeft className="mr-2" /> Back
             </button>
@@ -476,7 +490,7 @@ const CreateAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(2)}
-                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={
@@ -637,7 +651,7 @@ const CreateAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(1)}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                           >
@@ -646,7 +660,7 @@ const CreateAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(3)}
-                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={!formData.description}
@@ -718,6 +732,31 @@ const CreateAdoption = () => {
                                   </span>
                                 </motion.div>
                               )}
+                            </div>
+
+                            {/* Fake Video Upload (Pro Feature) */}
+                            <div className="mt-6">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Add a Video
+                              </label>
+
+                              <div
+                                onClick={() => openPremium("video_upload")}
+                                className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors relative w-68 h-44"
+                              >
+                                <Video className="w-8 h-8 text-gray-400 mb-2" />
+                                <span className="text-sm text-gray-500">
+                                  Upload a short pet video
+                                </span>
+
+                                <span className="absolute top-2 right-2 text-[10px] bg-yellow-400 text-black px-2 py-0.5 rounded-full font-semibold">
+                                  PRO
+                                </span>
+                              </div>
+
+                              {/* <p className="text-xs text-gray-500 mt-2"> */}
+                              {/*   Videos help pets get adopted faster */}
+                              {/* </p> */}
                             </div>
 
                             <input
@@ -812,7 +851,7 @@ const CreateAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(2)}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                           >
@@ -820,7 +859,7 @@ const CreateAdoption = () => {
                           </motion.button>
                           <motion.button
                             type="submit"
-                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={isUploading}
@@ -847,39 +886,39 @@ const CreateAdoption = () => {
           </motion.div>
         </div>
 
-        <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white py-12 mt-16">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="text-4xl font-bold mb-3">3,500+</div>
-                <p className="text-emerald-100">Pets Adopted</p>
-              </motion.div>
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <div className="text-4xl font-bold mb-3">98%</div>
-                <p className="text-emerald-100">Success Rate</p>
-              </motion.div>
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <div className="text-4xl font-bold mb-3">24h</div>
-                <p className="text-emerald-100">Average Adoption Time</p>
-              </motion.div>
-            </div>
-          </div>
-        </div>
+        {/* <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white py-12 mt-16"> */}
+        {/*   <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"> */}
+        {/*     <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> */}
+        {/*       <motion.div */}
+        {/*         className="text-center" */}
+        {/*         initial={{ opacity: 0, y: 20 }} */}
+        {/*         animate={{ opacity: 1, y: 0 }} */}
+        {/*         transition={{ delay: 0.2 }} */}
+        {/*       > */}
+        {/*         <div className="text-4xl font-bold mb-3">3,500+</div> */}
+        {/*         <p className="text-emerald-100">Pets Adopted</p> */}
+        {/*       </motion.div> */}
+        {/*       <motion.div */}
+        {/*         className="text-center" */}
+        {/*         initial={{ opacity: 0, y: 20 }} */}
+        {/*         animate={{ opacity: 1, y: 0 }} */}
+        {/*         transition={{ delay: 0.4 }} */}
+        {/*       > */}
+        {/*         <div className="text-4xl font-bold mb-3">98%</div> */}
+        {/*         <p className="text-emerald-100">Success Rate</p> */}
+        {/*       </motion.div> */}
+        {/*       <motion.div */}
+        {/*         className="text-center" */}
+        {/*         initial={{ opacity: 0, y: 20 }} */}
+        {/*         animate={{ opacity: 1, y: 0 }} */}
+        {/*         transition={{ delay: 0.6 }} */}
+        {/*       > */}
+        {/*         <div className="text-4xl font-bold mb-3">24h</div> */}
+        {/*         <p className="text-emerald-100">Average Adoption Time</p> */}
+        {/*       </motion.div> */}
+        {/*     </div> */}
+        {/*   </div> */}
+        {/* </div> */}
 
         <Footer />
       </div>

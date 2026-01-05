@@ -8,6 +8,7 @@ import Footer from "../../component/Footer";
 import HamsterLoader from "../../component/Loader";
 import { UserContext } from "../../context/UserContext";
 import axios from "axios";
+import PremiumModal from "../../component/PremiumModal";
 
 export default function Listing() {
   const [selectedSpecies, setSelectedSpecies] = useState("All");
@@ -19,6 +20,13 @@ export default function Listing() {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [premiumFeatureSource, setPremiumFeatureSource] = useState(null);
+
+  const openPremium = (source) => {
+    setPremiumFeatureSource(source);
+    setIsPremiumModalOpen(true);
+  };
 
   const cardsPerPage = 9;
 
@@ -124,12 +132,17 @@ export default function Listing() {
 
   return (
     <>
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
+        featureSource={premiumFeatureSource}
+      />
       <Navbar />
 
       {/* Hero Section */}
       <section className="relative w-full min-h-[500px] bg-gray-100 overflow-hidden">
         <img
-          src="/Banner-2.png"
+          src="Banner_1.png"
           alt="Happy pets together"
           className="absolute inset-0 w-full h-full object-cover"
           onError={(e) => {
@@ -199,6 +212,18 @@ export default function Listing() {
             available
             {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
           </p>
+
+          <div className="mb-4 rounded-xl bg-[#A0C878]/10 p-4 flex max-md:flex-col justify-between items-center">
+            <p className="text-sm text-gray-700">
+              Bingung memilih? Kami bisa bantu 👀
+            </p>
+            <button
+              onClick={() => openPremium("ai_recommender")}
+              className="text-sm font-semibold text-[#A0C878] cursor-pointer "
+            >
+              Gunakan AI Recommender
+            </button>
+          </div>
         </div>
 
         {/* Card Grid */}

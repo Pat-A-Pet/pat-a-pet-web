@@ -115,7 +115,7 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-black/5 z-[1]" />
         <img
-          src="/Herro Banner-1.png"
+          src="/Herro Banner.png"
           alt="Hero"
           className="w-full h-full object-cover"
           loading="eager"

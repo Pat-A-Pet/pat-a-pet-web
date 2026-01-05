@@ -11,6 +11,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleSignUp = async (e) => {
@@ -40,6 +41,19 @@ export default function SignUp() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      try {
+        await axios.post(
+          `${baseUrl}/fake-door/track`,
+          {
+            featureTriggered: "user_signup_success",
+            hasOpenedModal: false,
+          },
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+      } catch (trackErr) {
+        console.warn("Tracking failed but user is signed up", trackErr);
+      }
+
       navigate("/home");
     } catch (err) {
       console.error(err.response?.data?.error || err.message);
@@ -54,9 +68,9 @@ export default function SignUp() {
       {/* Left Section */}
       <div className="w-1/2 relative flex justify-center items-center text-white px-10 bg-[#A0C878]">
         <img
-          src="icon-bg.png"
+          src="image 28.png"
           alt="Dogs"
-          className="absolute bottom-0 left-0 w-full h-[250px] object-contain"
+          className="absolute bottom-0 left-0 w-full h-[450px] object-contain"
         />
         <div className="relative z-10 max-w-md text-left">
           <h1
@@ -75,7 +89,7 @@ export default function SignUp() {
 
       {/* Right Section */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-[#FDF7F4] p-10 rounded-tl-[50px] rounded-bl-[50px] shadow-lg">
-        <img src="logo.png" alt="logo" className="w-40 mb-3" />
+        <img src="logo-removebg.png" alt="logo" className="w-40 mb-3" />
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">
           Create Account
         </h2>
@@ -111,20 +125,33 @@ export default function SignUp() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-[20px] transform -translate-y-1/2 text-sm text-gray-600"
+              className="absolute right-4 top-[20px] transform -translate-y-1/2 text-sm text-gray-600 cursor-pointer"
             >
               {showPassword ? <FiEye size={20} /> : <FiEyeOff size={20} />}
             </button>
           </div>
 
           <label className="block text-gray-700 mb-2">Confirm Password</label>
-          <input
-            type="password"
-            placeholder="********"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="relative w-full">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="********"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 top-[20px] transform -translate-y-1/2 text-sm text-gray-600 cursor-pointer"
+            >
+              {showConfirmPassword ? (
+                <FiEye size={20} />
+              ) : (
+                <FiEyeOff size={20} />
+              )}
+            </button>
+          </div>
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
@@ -141,7 +168,7 @@ export default function SignUp() {
           Already have an account?{" "}
           <button
             onClick={() => navigate("/signin")}
-            className="font-bold hover:underline"
+            className="font-bold hover:underline cursor-pointer"
             style={{ color: "#A0C878" }}
           >
             Sign in

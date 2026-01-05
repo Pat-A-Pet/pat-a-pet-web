@@ -15,10 +15,12 @@ import {
   FiEdit,
   FiTrash2,
 } from "react-icons/fi";
+import { Video } from "lucide-react";
 import Navbar from "../../component/Navbar";
 import Footer from "../../component/Footer";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
+import PremiumModal from "../../component/PremiumModal";
 
 const EditAdoption = () => {
   const { id } = useParams();
@@ -34,6 +36,8 @@ const EditAdoption = () => {
 
   const MAX_STEPS = 3;
   const progressPercentage = (step / MAX_STEPS) * 100;
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [premiumFeatureSource, setPremiumFeatureSource] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -56,6 +60,11 @@ const EditAdoption = () => {
     keptImages: [], // Existing images that are kept
     newFiles: [], // New files to be uploaded
   });
+
+  const openPremium = (source) => {
+    setPremiumFeatureSource(source);
+    setIsPremiumModalOpen(true);
+  };
 
   // Fetch existing pet data
   useEffect(() => {
@@ -376,6 +385,11 @@ const EditAdoption = () => {
 
   return (
     <>
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
+        featureSource={premiumFeatureSource}
+      />
       <Navbar />
 
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white mt-16">
@@ -385,7 +399,7 @@ const EditAdoption = () => {
             <div className="flex justify-between items-center mb-4">
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center text-emerald-600 hover:text-emerald-800 font-medium"
+                className="flex items-center text-emerald-600 hover:text-emerald-800 font-medium cursor-pointer"
               >
                 <FiArrowLeft className="mr-2" /> Back
               </button>
@@ -431,7 +445,7 @@ const EditAdoption = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-xl font-medium flex items-center gap-2"
+                    className="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-xl font-medium flex items-center cursor-pointer"
                     onClick={handleDeletePost}
                     disabled={isUploading}
                   >
@@ -640,7 +654,7 @@ const EditAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(2)}
-                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={
@@ -800,7 +814,7 @@ const EditAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(1)}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                           >
@@ -809,7 +823,7 @@ const EditAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(3)}
-                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={!formData.description}
@@ -911,6 +925,31 @@ const EditAdoption = () => {
                               )}
                             </div>
 
+                            {/* Fake Video Upload (Pro Feature) */}
+                            <div className="mt-6">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Add a Video
+                              </label>
+
+                              <div
+                                onClick={() => openPremium("video_upload")}
+                                className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors relative w-68 h-44"
+                              >
+                                <Video className="w-8 h-8 text-gray-400 mb-2" />
+                                <span className="text-sm text-gray-500">
+                                  Upload a short pet video
+                                </span>
+
+                                <span className="absolute top-2 right-2 text-[10px] bg-yellow-400 text-black px-2 py-0.5 rounded-full font-semibold">
+                                  PRO
+                                </span>
+                              </div>
+
+                              {/* <p className="text-xs text-gray-500 mt-2"> */}
+                              {/*   Videos help pets get adopted faster */}
+                              {/* </p> */}
+                            </div>
+
                             <input
                               type="file"
                               ref={fileInputRef}
@@ -1003,7 +1042,7 @@ const EditAdoption = () => {
                           <motion.button
                             type="button"
                             onClick={() => setStep(2)}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                           >
@@ -1011,7 +1050,7 @@ const EditAdoption = () => {
                           </motion.button>
                           <motion.button
                             type="submit"
-                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                            className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={isUploading}

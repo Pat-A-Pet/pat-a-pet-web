@@ -20,6 +20,7 @@ import { UserContext } from "../../context/UserContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { StreamChat } from "stream-chat";
 import axios from "axios";
+import PremiumModal from "../../component/PremiumModal";
 
 const STREAM_CHAT_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -41,6 +42,9 @@ const ChatPage = () => {
   });
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const FREE_MESSAGE_LIMIT = 10;
+  const [sentMessageCount, setSentMessageCount] = useState(0);
+  const [premiumFeature, setPremiumFeature] = useState(null);
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -105,7 +109,7 @@ const ChatPage = () => {
           return;
         }
 
-        console.log("Initializing Stream Chat for user:", user.id);
+        // console.log("Initializing Stream Chat for user:", user.id);
 
         const chatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
 
@@ -116,7 +120,7 @@ const ChatPage = () => {
           { headers: { Authorization: `Bearer ${token}` } },
         );
 
-        console.log("Got Stream token, connecting user...");
+        // console.log("Got Stream token, connecting user...");
 
         // Connect user to Stream Chat
         await chatClient.connectUser(
@@ -130,7 +134,7 @@ const ChatPage = () => {
           tokenResponse.data.token,
         );
 
-        console.log("Stream Chat connected successfully");
+        // console.log("Stream Chat connected successfully");
 
         if (isMounted) {
           setStreamClient(chatClient);
@@ -164,7 +168,7 @@ const ChatPage = () => {
   useEffect(() => {
     return () => {
       if (streamClient && streamClient.userID) {
-        console.log("Disconnecting Stream Chat client");
+        // console.log("Disconnecting Stream Chat client");
         streamClient.disconnectUser().catch(console.error);
       }
     };
@@ -174,12 +178,12 @@ const ChatPage = () => {
   useEffect(() => {
     const loadConversations = async () => {
       if (!streamClient || !streamClient.userID || !user?.id) {
-        console.log("Skipping conversation load - client or user not ready");
+        // console.log("Skipping conversation load - client or user not ready");
         return;
       }
 
       try {
-        console.log("Loading conversations for user:", user.id);
+        // console.log("Loading conversations for user:", user.id);
         setLoading((prev) => ({ ...prev, conversations: true }));
 
         const channels = await streamClient.queryChannels(
@@ -188,7 +192,7 @@ const ChatPage = () => {
           { watch: true, state: true },
         );
 
-        console.log("Loaded channels:", channels.length);
+        // console.log("Loaded channels:", channels.length);
 
         const formattedConversations = channels.map((channel) =>
           formatConversation(channel, user.id),
@@ -211,7 +215,7 @@ const ChatPage = () => {
   useEffect(() => {
     const loadChannel = async () => {
       if (!streamClient || !streamClient.userID) {
-        console.log("Stream client not ready for channel load");
+        // console.log("Stream client not ready for channel load");
         setActiveChannel(null);
         setMessages([]);
         setLoading((prev) => ({ ...prev, messages: false }));
@@ -222,27 +226,27 @@ const ChatPage = () => {
         setLoading((prev) => ({ ...prev, messages: true }));
 
         if (channelId) {
-          console.log("Loading channel:", channelId);
+          // console.log("Loading channel:", channelId);
 
           const channel = streamClient.channel("messaging", channelId);
           await channel.watch();
 
-          console.log(
-            "Channel loaded, messages:",
-            channel.state.messages?.length || 0,
-          );
+          // console.log(
+          //   "Channel loaded, messages:",
+          //   channel.state.messages?.length || 0,
+          // );
 
           setMessages(channel.state.messages || []);
           setActiveChannel(channel);
 
           // Set up real-time message listeners
           const handleMessage = (event) => {
-            console.log("New message received:", event.message);
+            // console.log("New message received:", event.message);
             setMessages((prev) => [...prev, event.message]);
           };
 
           const handleMessageUpdated = (event) => {
-            console.log("Message updated:", event.message);
+            // console.log("Message updated:", event.message);
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === event.message.id ? event.message : msg,
@@ -255,7 +259,7 @@ const ChatPage = () => {
 
           // Return cleanup function
           return () => {
-            console.log("Cleaning up channel listeners");
+            // console.log("Cleaning up channel listeners");
             channel.off("message.new", handleMessage);
             channel.off("message.updated", handleMessageUpdated);
           };
@@ -291,10 +295,16 @@ const ChatPage = () => {
     e.preventDefault();
     if (!messageInput.trim() || !activeChannel) return;
 
+    if (sentMessageCount >= FREE_MESSAGE_LIMIT) {
+      setPremiumFeature("unlimited_chat");
+      return;
+    }
+
     try {
-      console.log("Sending message:", messageInput.trim());
+      // console.log("Sending message:", messageInput.trim());
       await activeChannel.sendMessage({ text: messageInput.trim() });
       setMessageInput("");
+      setSentMessageCount((prev) => prev + 1);
     } catch (err) {
       console.error("Failed to send message:", err);
       setError("Failed to send message");
@@ -372,6 +382,11 @@ const ChatPage = () => {
 
   return (
     <>
+      <PremiumModal
+        isOpen={!!premiumFeature}
+        onClose={() => setPremiumFeature(null)}
+        featureSource={premiumFeature}
+      />
       <Navbar />
       <div className="h-max bg-gradient-to-br from-emerald-50 via-white to-green-50 mt-16">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row h-[calc(100vh-80px)]">
@@ -621,6 +636,12 @@ const ChatPage = () => {
                       <div ref={messagesEndRef} />
                     </div>
                   </div>
+
+                  {sentMessageCount >= FREE_MESSAGE_LIMIT - 2 && (
+                    <p className="text-xs text-orange-500 mb-2 text-center">
+                      Kamu hampir mencapai batas chat gratis.
+                    </p>
+                  )}
 
                   {/* Message Input */}
                   <div className="border-t border-gray-200 p-4 bg-white/90 backdrop-blur-sm">

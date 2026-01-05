@@ -8,10 +8,11 @@ import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
 // import HamsterLoader from "../../component/Loader";
 import { useNavigate } from "react-router-dom";
+import PremiumModal from "../../component/PremiumModal";
 
 export default function PetDetail() {
   const { user } = useContext(UserContext);
-  console.log(user);
+  // console.log(user);
   const { id } = useParams();
   const [isLiked, setIsLiked] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
@@ -21,6 +22,26 @@ export default function PetDetail() {
   const navigate = useNavigate();
   const [isCreatingChannel, setIsCreatingChannel] = useState(false);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [premiumFeatureSource, setPremiumFeatureSource] = useState(null);
+
+  const openPremium = (source) => {
+    setPremiumFeatureSource(source);
+    setIsPremiumModalOpen(true);
+  };
+
+  // 2. Modified Image array to include Video at index 0
+  const mediaList = petData
+    ? [
+        { type: "video", url: petData.imageUrls[0], isLocked: true }, // Use 1st image as thumbnail
+        ...petData.imageUrls.map((url) => ({ type: "image", url })),
+      ]
+    : [];
+
+  const handleVideoClick = () => {
+    setIsPremiumModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchPetData = async () => {
@@ -35,7 +56,7 @@ export default function PetDetail() {
           throw new Error("Pet not found");
         }
 
-        console.log("Owner data:", petData.owner); // Verify owner data
+        // console.log("Owner data:", petData.owner); // Verify owner data
         setPetData(petData);
         setLoading(false);
       } catch (err) {
@@ -115,7 +136,7 @@ export default function PetDetail() {
         ownerId: petData.owner._id, // Ensure petData.owner is an object with an _id property
       };
 
-      console.log("Sending payload to create-channel:", payload); // For debugging: see what's being sent
+      // console.log("Sending payload to create-channel:", payload); // For debugging: see what's being sent
 
       const response = await axios.post(
         `${baseUrl}/chat/create-channel`,
@@ -129,10 +150,10 @@ export default function PetDetail() {
       );
 
       if (response.data.success && response.data.channelId) {
-        console.log(
-          "Channel created/retrieved successfully:",
-          response.data.channelId,
-        );
+        // console.log(
+        //   "Channel created/retrieved successfully:",
+        //   response.data.channelId,
+        // );
         navigate(`/chat/${response.data.channelId}`);
       } else {
         console.error(
@@ -212,17 +233,20 @@ export default function PetDetail() {
   return (
     <>
       <Navbar />
-
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
+        featureSource={premiumFeatureSource}
+      />
       <div className="min-h-screen bg-gray-50 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left: Pet Image Slider */}
-            <div>
-              <PetImageSlider
-                images={petData.imageUrls}
-                owner={petData.owner}
-              />
-            </div>
+            {/* Left: Modified Pet Image Slider */}
+            <PetImageSlider
+              media={mediaList}
+              owner={petData.owner}
+              onVideoClick={handleVideoClick}
+            />
 
             {/* Right: Pet Information */}
             <div className="space-y-6">
@@ -249,7 +273,7 @@ export default function PetDetail() {
                         isLiked
                           ? "bg-red-500 text-white scale-110"
                           : "bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500"
-                      }`}
+                      } cursor-pointer`}
                     >
                       <svg
                         className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`}
@@ -311,6 +335,13 @@ export default function PetDetail() {
                   </div>
                 </div>
 
+                <button
+                  onClick={() => openPremium("ai_recommender")}
+                  className="mt-4 w-full rounded-xl border border-[#A0C878] px-4 py-3 text-sm font-semibold text-[#A0C878] hover:bg-[#A0C878] hover:text-white transition cursor-pointer mb-6"
+                >
+                  🤖 Rekomendasi AI: Cocok nggak buat kamu?
+                </button>
+
                 {/* Adoption Fee */}
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
                   <div className="flex items-center justify-between">
@@ -351,7 +382,7 @@ export default function PetDetail() {
                       user && user.id === petData.owner._id
                         ? "opacity-50 cursor-not-allowed"
                         : ""
-                    }`}
+                    } cursor-pointer`}
                   >
                     Adopt {petData.name}
                   </button>
@@ -366,7 +397,7 @@ export default function PetDetail() {
                       (user && user.id === petData.owner._id)
                         ? "opacity-50 cursor-not-allowed"
                         : ""
-                    }`}
+                    } cursor-pointer`}
                   >
                     {isCreatingChannel ? "Loading..." : "Message"}
                   </button>
@@ -388,7 +419,7 @@ export default function PetDetail() {
                         activeTab === tab.id
                           ? "text-gray-500 border-b-2 border-[#A0C878]"
                           : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                      }`}
+                      } cursor-pointer`}
                     >
                       <span>{tab.icon}</span>
                       {tab.label}

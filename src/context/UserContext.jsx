@@ -11,11 +11,11 @@ const UserProvider = ({ children }) => {
 
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
-    console.log("Token from localStorage:", token); // <-- Add this
+    // console.log("Token from localStorage:", token); // <-- Add this
     if (!token) {
       setUser(null);
       setLoading(false);
-      console.log("No token found, user is null."); // <-- Add this
+      // console.log("No token found, user is null."); // <-- Add this
       return;
     }
 
@@ -33,7 +33,7 @@ const UserProvider = ({ children }) => {
       }
 
       const data = await res.json();
-      console.log("Data from /api/auth/profile:", data); // <-- Add this to see the raw response
+      // console.log("Data from /api/auth/profile:", data); // <-- Add this to see the raw response
       setUser({
         id: data.user._id,
         fullname: data.user.fullname,
@@ -42,7 +42,7 @@ const UserProvider = ({ children }) => {
         token: token,
         // Add other fields you need
       });
-      console.log("User set in context:", { ...data, token }); // <-- Add this to see the final user object
+      // console.log("User set in context:", { ...data, token }); // <-- Add this to see the final user object
     } catch (err) {
       console.error("Error fetching user:", err);
       setUser(null);

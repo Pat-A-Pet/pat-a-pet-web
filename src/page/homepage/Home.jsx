@@ -33,7 +33,7 @@ export default function Home() {
           ? { Authorization: `Bearer ${user.token}` }
           : {};
 
-        console.log("User token:", user?.token);
+        // console.log("User token:", user?.token);
 
         // Fetch pets with auth headers
         const petsResponse = await axios.get(`${baseUrl}/pets/get-listings`, {
@@ -100,7 +100,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative w-full h-full">
         <img
-          src="/Herro Banner-1.png"
+          src="/Herro Banner_1.png"
           alt="Hero"
           className="w-full h-full object-cover"
         />

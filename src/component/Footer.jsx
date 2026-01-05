@@ -2,12 +2,38 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../handler/AuthHandler";
+import axios from "axios";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+
+  // --- Fungsi Fake Door Tracking ---
+  const trackDownload = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/fake-door/track`,
+        {
+          featureTriggered: "android_app_download",
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+    } catch (err) {
+      console.error("Failed to track download click", err);
+    }
+  };
+
+  const handleDownloadClick = (e) => {
+    if (!isAuthenticated) {
+      e.preventDefault(); // Batalkan download otomatis
+      navigate("/signup");
+    } else {
+      trackDownload(); // Jalankan tracking jika sudah login
+    }
+  };
 
   // Scroll to section function for landing page
   const scrollTo = (id) => {
@@ -49,9 +75,28 @@ const Footer = () => {
     <footer className="bg-[#FAF6E9] text-gray-500 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <a href="/">
-            <img src="logo-removebg.png" alt="pat-a-pet" className="w-40" />
-          </a>
+          <div className="flex flex-col gap-8">
+            <a href="/">
+              <img src="logo-removebg.png" alt="pat-a-pet" className="w-40" />
+            </a>
+            <div className="mt-2">
+              <a
+                href="/downloadables/Pat-A-Pet.apk"
+                download="Pat-A-Pet.apk"
+                onClick={handleDownloadClick} // Panggil tracking di sini
+                className="inline-flex items-center px-4 py-2 text-black rounded-lg hover:scale-105 transition-transform duration-200 text-sm font-medium"
+              >
+                <svg
+                  className="h-5 w-5 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M3 3h18a1 1 0 011 1v16a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1zm1 2v14h16V5H4zm8 10l4-4h-3V7h-2v4H8l4 4z" />
+                </svg>
+                Download Android App
+              </a>
+            </div>
+          </div>
 
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>

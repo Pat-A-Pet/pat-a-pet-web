@@ -31,6 +31,19 @@ export default function SignIn() {
       // 2. Fetch user data into context
       await fetchUser();
 
+      try {
+        await axios.post(
+          `${baseUrl}/fake-door/track`,
+          {
+            featureTriggered: "user_signin_success",
+            hasOpenedModal: false,
+          },
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+      } catch (trackErr) {
+        console.warn("Tracking failed but user is signed in", trackErr);
+      }
+
       // 3. Connect to Stream Chat
       const chatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
       const tokenResponse = await axios.post(
@@ -89,16 +102,16 @@ export default function SignIn() {
 
       <div className="w-1/2 relative flex justify-center items-center text-white px-10 bg-[#A0C878]">
         <img
-          src="icon-bg.png"
+          src="image 28.png"
           alt="Dogs"
-          className="absolute bottom-0 left-0 w-full h-[250px] object-contain"
+          className="absolute bottom-0 left-0 w-full h-[450px] object-contain"
         />
         <div className="relative z-10 max-w-md text-left">
           <h1
             style={{ fontFamily: "'Epilogue', sans-serif" }}
             className="text-white font-bold text-[50px] leading-[1.1]"
           >
-            Welcome back <br /> Pawrents
+            Welcome back <br /> Parents
           </h1>
           <hr className="border-white w-20 my-4" />
           {/* <p className="text-lg">Fast and easy melanoma detection using advanced AI technology.</p> */}
@@ -111,11 +124,11 @@ export default function SignIn() {
       {/* Right Section */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-[#FDF7F4] p-10 rounded-tl-[50px] rounded-bl-[50px] shadow-lg">
         <img
-          src="logo.png"
+          src="logo-removebg.png"
           alt="pat-a-pet"
           className="absolute top-15 mid w-40 z-20"
         />
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6 point">
           Sign In to Pat-A-Pet
         </h2>
 
@@ -141,7 +154,7 @@ export default function SignIn() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-[20px] transform -translate-y-1/2 text-sm text-gray-600"
+              className="absolute right-4 top-[20px] transform -translate-y-1/2 text-sm text-gray-600 cursor-pointer"
             >
               {showPassword ? <FiEye size={20} /> : <FiEyeOff size={20} />}
             </button>
@@ -155,7 +168,7 @@ export default function SignIn() {
             </label>
             <a
               href="#"
-              className="hover:underline font-bold"
+              className="hover:underline font-bold cursor-default"
               style={{ color: "#A0C878" }}
             >
               Forgot Password?
@@ -164,7 +177,7 @@ export default function SignIn() {
 
           <button
             type="submit"
-            className="w-full text-white py-2 rounded-lg font-semibold hover:bg-[#0f6b87] transition"
+            className="w-full text-white py-2 rounded-lg font-semibold hover:bg-[#0f6b87] transition cursor-pointer"
             style={{ backgroundColor: "#A0C878" }}
           >
             Sign in
@@ -175,7 +188,7 @@ export default function SignIn() {
           Don't have an account yet?{" "}
           <button
             onClick={() => navigate("/signup")}
-            className="font-bold hover:underline"
+            className="font-bold hover:underline cursor-pointer"
             style={{ color: "#A0C878" }}
           >
             Create account

@@ -24,7 +24,9 @@ import {
   FaEdit,
   FaChevronLeft,
   FaChevronRight,
+  FaCheckCircle,
 } from "react-icons/fa";
+import PremiumModal from "../../component/PremiumModal";
 
 const MyHub = () => {
   const [activeTab, setActiveTab] = useState("favorites");
@@ -45,6 +47,13 @@ const MyHub = () => {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [premiumFeatureSource, setPremiumFeatureSource] = useState(null);
+
+  const openPremium = (source) => {
+    setPremiumFeatureSource(source);
+    setIsPremiumModalOpen(true);
+  };
 
   // Animation variants
   const tabVariants = {
@@ -138,7 +147,7 @@ const MyHub = () => {
           },
         );
 
-        console.log("API Response:", response.data); // Add this to debug
+        // console.log("API Response:", response.data); // Add this to debug
 
         // Check if data is nested differently
         setCardsData(response.data.pets || response.data.data || response.data);
@@ -455,6 +464,11 @@ const MyHub = () => {
 
   return (
     <>
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
+        featureSource={premiumFeatureSource}
+      />
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
         <Navbar />
 
@@ -506,6 +520,15 @@ const MyHub = () => {
                   <h3 className="font-bold text-lg text-white">
                     {user.fullname}
                   </h3>
+                  <button
+                    onClick={() => openPremium("verified_badge")}
+                    className="mt-1 inline-flex items-center gap-2 px-3 py-1.5 rounded-full
+             bg-white/20 hover:bg-white/30 backdrop-blur-sm
+             text-white text-sm font-semibold cursor-pointer"
+                  >
+                    <FaCheckCircle className="text-blue-300" />
+                    Get Verified
+                  </button>
                   <motion.button
                     className="mt-3 text-sm bg-white text-emerald-600 px-4 py-2 rounded-full font-medium shadow-md hover:shadow-lg transition-all"
                     whileHover={{ scale: 1.05 }}
@@ -917,6 +940,16 @@ const MyHub = () => {
                                   whileTap={{ scale: 0.95 }}
                                 >
                                   Manage Post
+                                </motion.button>
+                                <motion.button
+                                  onClick={() =>
+                                    openPremium("priority_listing_pet")
+                                  }
+                                  className="flex-1 bg-yellow-100 hover:bg-yellow-200
+             text-yellow-800 py-2 rounded-lg font-medium
+             text-sm border border-yellow-300 cursor-pointer"
+                                >
+                                  🚀 Boost Listing
                                 </motion.button>
                                 <motion.button
                                   onClick={() => handleDeleteAdoption(pet._id)}
